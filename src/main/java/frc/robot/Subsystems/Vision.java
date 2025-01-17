@@ -18,14 +18,26 @@ public class Vision extends SubsystemBase {
     private PhotonCamera frontCamera;
     private PhotonPoseEstimator frontPoseEstimator;
 
+    private PhotonCamera leftCamera;
+    private PhotonPoseEstimator leftPoseEstimator;
+
     public Vision() {
         fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
         frontCamera = new PhotonCamera("frontCamera");
         frontPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision_Constants.robotToFrontCamera);
+
+        leftCamera = new PhotonCamera("leftCamera");
+        leftPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision_Constants.robotToLeftCamera);
     }
+
+    //TODO: Switch to new method when docs update
 
     public Optional<EstimatedRobotPose> getFrontPose() {
         return frontPoseEstimator.update(frontCamera.getLatestResult());
+    }
+
+    public Optional<EstimatedRobotPose> getLeftPose() {
+        return leftPoseEstimator.update(leftCamera.getLatestResult());
     }
 }
