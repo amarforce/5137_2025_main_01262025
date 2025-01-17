@@ -22,8 +22,8 @@ public class RobotContainer {
   private wrist wrist;
   private intake intake;
 
-  private Wrist_Commands Wrist_Commands;
-  private Intake_Commands Intake_Commands;
+  private Wrist_Commands wrist_Commands;
+  private Intake_Commands intake_Commands;
 
   
 
@@ -33,23 +33,24 @@ public class RobotContainer {
     driver = new CommandPS5Controller(0);
     operator = new CommandPS5Controller(1);
 
-    configureBindings();
+ 
     wrist = new wrist();
     intake = new intake();
 
-    Wrist_Commands = new Wrist_Commands(wrist);
-    Intake_Commands = new Intake_Commands(intake);
+    wrist_Commands = new Wrist_Commands(wrist);
+    intake_Commands = new Intake_Commands(intake);
+    configureBindings();
   }
 
   private void configureBindings() {
-    driver.L2()
-    .onTrue(Intake_Commands.intakeForward())
-    .onFalse(Intake_Commands.stop()
+    operator.cross()
+    .onTrue(intake_Commands.intakeForward())
+    .onFalse(intake_Commands.stop()
     );
 
-    operator.L2()
-    .onTrue(Wrist_Commands.wristForward())
-    .onFalse(Wrist_Commands.stop()
+    operator.triangle()
+    .onTrue(wrist_Commands.wristForward())
+    .onFalse(wrist_Commands.stop()
     );
     // No reverse created
     //Talk to mechanical about wrist positions
