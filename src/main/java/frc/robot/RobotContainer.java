@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Vision;
 import frc.robot.commands.ElevatorCommands;
 import frc.robot.elastic.Reef;
 
@@ -16,7 +17,10 @@ public class RobotContainer {
   private PS5Controller operator = new PS5Controller(1);
   private Reef reef=new Reef();
 
+  private Vision vision;
+
   public RobotContainer() {
+    vision=new Vision();
     elevator = new Elevator();
     elevatorCommands = new ElevatorCommands(elevator);
     configureBindings();
