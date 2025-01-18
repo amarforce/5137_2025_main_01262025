@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class wrist extends SubsystemBase{
     private TalonFX wristMotor = new TalonFX(4, "rhino");;
@@ -37,7 +38,7 @@ public class wrist extends SubsystemBase{
     private final MechanismRoot2d mech2dRoot = mech2d.getRoot("WristRoot", 10, 0);
     private final MechanismLigament2d armMech2d = mech2dRoot.append(new MechanismLigament2d("Wrist", 20, 90));
 
-    private SingleJointedArmSim wristSim = new SingleJointedArmSim(DCMotor.getFalcon500(1), Wrist_Constants.gearRatio, Wrist_Constants.jkg, Wrist_Constants.wristLength, 0, 0, false, 0, null)
+    private SingleJointedArmSim wristSim = new SingleJointedArmSim(DCMotor.getFalcon500(1), Wrist_Constants.gearRatio, Wrist_Constants.jkg, Wrist_Constants.wristLength, Wrist_Constants.min, Wrist_Constants.max, true, Wrist_Constants.min);
 
     public void setWristSpeed(double speed){
         wristMotor.set(speed);
@@ -61,6 +62,22 @@ public class wrist extends SubsystemBase{
     } 
 
 
+    public double getPose() {
+        return ((wristMotor.getPosition().getValueAsDouble()+Wrist_Constants.wristOffset)/Wrist_Constants.gearRatio);
+    }
+
+
+
+
+    public void telemetry() {
+        SmartDashboard.putNumber("Wrist pose", wristSim.getAngleRads());
+        SmartDashboard.putNumber("Wrist Velocity", wristSim.getVelocityRadPerSec());
+        SmartDashboard.putNumber("Wrist Speed", wristMotor.get());
+        armMech2d.setAngle(getPose()*360);
+        SmartDashboard.putData("Wrist", mech2d);
+    }
+
+
 
 
 
@@ -73,14 +90,15 @@ public class wrist extends SubsystemBase{
 
     @Override
     public void simulationPeriodic(){
-        fakeWristMotor.setSupplyVoltage(2);
-
+        fakeWristMotor.setSupplyVoltage(RobotController.getBatteryVoltage());
         double wristInput = fakeWristMotor.getMotorVoltage();
+        wristSim.setInputVoltage(wristInput);
+        wristSim.update(0.02);
+        double angle = wristSim.getAngleRads()/(Math.PI*2);
 
-
-
-        fakeWristMotor.setRotorVelocity(0.3);
-        fakeWristMotor.setRawRotorPosition(0.3);
+        fakeWristMotor.setRotorVelocity(wristSim.getVelocityRadPerSec()/(Math.PI*2)*Wrist_Constants.gearRatio);
+        fakeWristMotor.setRawRotorPosition((angle*Wrist_Constants.gearRatio)-Wrist_Constants.wristOffset);
+        RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(wristSim.getCurrentDrawAmps()));
     }
 }
 
