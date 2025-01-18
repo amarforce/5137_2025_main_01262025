@@ -1,6 +1,6 @@
 package frc.robot.Constants;
 
-public class Wrist_Constants {
+public class wristConstants {
 
     //public static final double maxSupplyCurrent = 40;
     public static final double defaultMotorSpeed = .3;

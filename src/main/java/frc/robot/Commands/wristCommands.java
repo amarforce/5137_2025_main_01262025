@@ -4,12 +4,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Subsystems.wrist;
 
 
-public class Wrist_Commands {
+public class wristCommands {
   
    
     private wrist wrist;
     private Timer timer;
-    public Wrist_Commands(wrist wrist){
+    public wristCommands(wrist wrist){
         this.wrist = wrist;
       
         
