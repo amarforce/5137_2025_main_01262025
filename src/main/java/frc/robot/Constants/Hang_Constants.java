@@ -13,5 +13,4 @@ public class Hang_Constants {
         public static final int MIN_PRESSURE = 0; // Start compressor below this PSI
         public static final int MAX_PRESSURE = 120; // Stop compressor above this PSI
     }
-    
 }
