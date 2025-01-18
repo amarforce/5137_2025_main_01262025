@@ -43,7 +43,7 @@ public class Hang_Subsystem extends SubsystemBase {
 
     }
     public boolean isClampActivated(){
-        clamp_solenoid.get();
+        return clamp_solenoid.get();
 
     }
     public void climbExtend(){
