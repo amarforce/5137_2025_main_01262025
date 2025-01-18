@@ -13,13 +13,15 @@ import edu.wpi.first.wpilibj.Compressor;
 
 public class Hang_Subsystem extends SubsystemBase {
     
-    
+    private final Solenoid clamp_solenoid;
+    private final Solenoid climb_solenoid;
+
     
     
     
     public void PneumaticsSubsystem() {
-        final Solenoid o_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
-        final Solenoid t_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
+        final Solenoid clamp_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+        final Solenoid climb_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
 
         
     }
@@ -28,6 +30,32 @@ public class Hang_Subsystem extends SubsystemBase {
         final Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
         compressor.enableAnalog(70, 120);
         return compressor.getPressure();
+
+        
+    }
+
+    public void clampActivate(){
+        clamp_solenoid.set(true);
+
+    }
+    public void clampDeactivate(){
+        clamp_solenoid.set(false);
+
+    }
+    public boolean isClampActivated(){
+        clamp_solenoid.get();
+
+    }
+    public void climbExtend(){
+        climb_solenoid.set(true);
+
+    }
+    public void climbRetract(){
+        climb_solenoid.set(false);
+
+    }
+    public void isclimbExtended(){
+        climb_solenoid.get();
 
     }
        
