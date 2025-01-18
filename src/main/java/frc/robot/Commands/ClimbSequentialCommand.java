@@ -11,6 +11,8 @@ public class ClimbSequentialCommand extends SequentialCommandGroup {
         addCommands(
             Commands.runOnce(()-> hang_Subsystem.climbExtend()),
 
+            new WaitCommand(1.0),
+
             Commands.runOnce(()-> hang_Subsystem.clampDeactivate())
         );
     }
