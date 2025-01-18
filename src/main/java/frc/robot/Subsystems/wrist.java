@@ -1,18 +1,10 @@
 package frc.robot.Subsystems;
-
-
-
-import edu.wpi.first.units.measure.Angle;
-
 //import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 //import edu.wpi.first.wpilibj2.command.Command;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Wrist_Constants;
 import edu.wpi.first.math.system.plant.DCMotor;
 //import frc.robot.Constants.Wrist_Constants;
-import edu.wpi.first.math.util.Units;
-
 //import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -21,8 +13,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.wpilibj.RobotController;
 //simulation stuff
 import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -31,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class wrist extends SubsystemBase{
-    private TalonFX wristMotor = new TalonFX(4, "rhino");;
+    private TalonFX wristMotor = new TalonFX(4, "rhino");
     private TalonFXSimState fakeWristMotor = wristMotor.getSimState();
 
     private final Mechanism2d mech2d = new Mechanism2d(20, 50);
@@ -50,16 +40,18 @@ public class wrist extends SubsystemBase{
     }
 
     public void wristPos1(){
-        wristMotor.setPosition(90);
+        wristMotor.setPosition(1);
     }
 
     public void wristPos2(){
-        wristMotor.setPosition(0);
+        wristMotor.setPosition(0.25);
     }
 
     public double wristPosition(){
+        
+    
         return wristMotor.getPosition().getValueAsDouble();
-    } 
+    }
 
 
     public double getPose() {
@@ -77,7 +69,10 @@ public class wrist extends SubsystemBase{
         SmartDashboard.putData("Wrist", mech2d);
     }
 
-
+    @Override
+    public void periodic(){
+        telemetry();
+    }
 
 
 
