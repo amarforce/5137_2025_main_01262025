@@ -1,4 +1,4 @@
-package frc.robot.Subsystems;
+package frc.robot.subsystems;
 
 import java.util.Optional;
 
@@ -11,7 +11,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Vision_Constants;
+import frc.robot.constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
     private AprilTagFieldLayout fieldLayout;
@@ -28,10 +28,10 @@ public class Vision extends SubsystemBase {
         fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
         frontCamera = new PhotonCamera("frontCamera");
-        frontPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision_Constants.robotToFrontCamera);
+        frontPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.robotToFrontCamera);
 
         leftCamera = new PhotonCamera("leftCamera");
-        leftPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision_Constants.robotToLeftCamera);
+        leftPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.robotToLeftCamera);
 
         frontObjectCamera = new PhotonCamera("frontObjectCamera");
     }
