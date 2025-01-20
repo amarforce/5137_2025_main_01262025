@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveCommands {
@@ -22,12 +23,33 @@ public class SwerveCommands {
         );
     }
 
+    public InstantCommand driveToReefLeft() {
+        return new InstantCommand (
+            () -> swerve.driveToPose(SwerveConstants.reefA),
+            swerve
+        );
+    }
+
+    public InstantCommand driveToReefCenter() {
+        return new InstantCommand (
+            () -> swerve.driveToPose(SwerveConstants.reefAB),
+            swerve
+        );
+    }
+
+    public InstantCommand driveToReefRight() {
+        return new InstantCommand (
+            () -> swerve.driveToPose(SwerveConstants.reefB),
+            swerve
+        );
+    }
+
     public InstantCommand lock() {
         return new InstantCommand(() -> swerve.lock(), swerve);
     }
 
-    public InstantCommand reset() {
-        return new InstantCommand(() -> swerve.reset(), swerve);
+    public InstantCommand resetGyro() {
+        return new InstantCommand(() -> swerve.resetGyro(), swerve);
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {

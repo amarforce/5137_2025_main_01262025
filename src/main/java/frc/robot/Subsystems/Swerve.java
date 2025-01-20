@@ -4,8 +4,7 @@ import frc.robot.constants.SwerveConstants;
 import frc.robot.other.SwerveFactory;
 import frc.robot.other.Telemetry;
 
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import java.io.File;
 import java.util.Optional;
@@ -19,15 +18,25 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -41,6 +50,7 @@ public class Swerve extends SubsystemBase {
     private double maxAngularSpeed;
 
     private Telemetry logger;
+    private Field2d field;
 
     private SwerveRequest.FieldCentric fieldOrientedDrive;
     private SwerveRequest.RobotCentric robotOrientedDrive;
@@ -51,14 +61,6 @@ public class Swerve extends SubsystemBase {
 
         maxSpeed = SwerveFactory.getMaxSpeed();
         maxAngularSpeed = 1.5*Math.PI;
-
-        DriverStation.getAlliance().ifPresent(allianceColor -> {
-                swerve.setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                        ? Rotation2d.k180deg
-                        : Rotation2d.kZero
-                );
-            });
                 
         fieldOrientedDrive = new SwerveRequest.FieldCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
@@ -67,18 +69,58 @@ public class Swerve extends SubsystemBase {
         robotOrientedDrive = new SwerveRequest.RobotCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+        RobotConfig config;
+        try {
+        config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        AutoBuilder.configure(
+                this::getPose,
+                this::resetPose,
+                this::getCurrentSpeeds,
+                (speeds, feedforwards) -> drive(speeds),
+                new PPHolonomicDriveController(
+                        new PIDConstants(SwerveConstants.translation_kP, SwerveConstants.translation_kI, SwerveConstants.translation_kD),
+                        new PIDConstants(SwerveConstants.rotation_kP, SwerveConstants.rotation_kI, SwerveConstants.rotation_kD)
+                ),
+                config,
+                () -> onRedAlliance(),
+                this
+        );
         
         if (RobotBase.isSimulation()) {
             startSimThread();
         }
 
+        // Might remove telemtry, keep for now
         logger = new Telemetry(maxSpeed);
-
         swerve.registerTelemetry(logger::telemeterize);
+
+        field = new Field2d();
+        SmartDashboard.putData("Field", field);
     }
 
     public void setControl(SwerveRequest request) {
         swerve.setControl(request);
+    }
+
+    public void resetPose(Pose2d pose) {
+        swerve.resetPose(pose);
+    }
+
+    public Pose2d getPose() {
+        return swerve.getState().Pose;
+    }
+
+    public void drive(ChassisSpeeds speeds) {
+        setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds));
+    }
+
+    public ChassisSpeeds getCurrentSpeeds() {
+        return swerve.getState().Speeds;
     }
 
     public void percentOutput(double percentX, double percentY, double percentTheta, boolean fieldRelative) {
@@ -97,7 +139,33 @@ public class Swerve extends SubsystemBase {
         }
     }
 
-    public void reset() {
+    public void driveToPose(Pose2d pose) {
+        if (onRedAlliance()) {
+            pose = invertPose(pose);
+        }
+        Command path = AutoBuilder.pathfindToPose(pose, new PathConstraints(
+            MetersPerSecond.of(5.0),
+            MetersPerSecondPerSecond.of(5.0),
+            RadiansPerSecond.of(1.5*Math.PI),
+            RadiansPerSecondPerSecond.of(Math.PI)),
+            MetersPerSecond.of(0.0));
+        path.addRequirements(this);
+        path.schedule();
+    }
+
+    public Pose2d invertPose(Pose2d pose) {
+        return new Pose2d(SwerveConstants.fieldLength - pose.getX(), SwerveConstants.fieldWidth - pose.getY(), pose.getRotation().rotateBy(Rotation2d.k180deg));
+    }
+
+    public boolean onRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+            }
+        return false;
+    }
+
+    public void resetGyro() {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
             swerve.setOperatorPerspectiveForward(
                 allianceColor == Alliance.Red
@@ -128,6 +196,8 @@ public class Swerve extends SubsystemBase {
             leftPose.get().estimatedPose.toPose2d(),
             leftPose.get().timestampSeconds);
         }
+
+        field.setRobotPose(this.getPose());
     }
 
     // CTRE Generated SysId Routines

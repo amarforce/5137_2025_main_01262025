@@ -47,7 +47,11 @@ public class RobotContainer {
 
         driver.cross().whileTrue(swerveCommands.lock());
 
-        driver.options().onTrue(swerveCommands.reset());
+        driver.povLeft().onTrue(swerveCommands.driveToReefLeft());
+        driver.povUp().onTrue(swerveCommands.driveToReefCenter());
+        driver.povRight().onTrue(swerveCommands.driveToReefRight());
+
+        driver.options().onTrue(swerveCommands.resetGyro());
 
         /*
         driver.povUp().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineTranslation)));
