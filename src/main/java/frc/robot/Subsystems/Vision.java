@@ -38,11 +38,11 @@ public class Vision extends SubsystemBase {
 
     //TODO: Switch to new method when docs update
 
-    public Optional<EstimatedRobotPose> getFrontPose() {
+    public Optional<EstimatedRobotPose> getFrontPoseEstimate() {
         return frontPoseEstimator.update(frontCamera.getLatestResult());
     }
 
-    public Optional<EstimatedRobotPose> getLeftPose() {
+    public Optional<EstimatedRobotPose> getLeftPoseEstimate() {
         return leftPoseEstimator.update(leftCamera.getLatestResult());
     }
 
