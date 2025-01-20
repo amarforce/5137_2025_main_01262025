@@ -62,7 +62,10 @@ public class SwerveFactory {
                     .withSteerMotorType(SteerMotorArrangement.TalonFX_Integrated)
                     .withFeedbackSource(SteerFeedbackType.FusedCANcoder)
                     .withDriveMotorInitialConfigs(new TalonFXConfiguration())
-                    .withSteerMotorInitialConfigs(new TalonFXConfiguration())
+                    .withSteerMotorInitialConfigs(new TalonFXConfiguration()
+                        .withCurrentLimits(new CurrentLimitsConfigs()
+                            .withStatorCurrentLimit(Amps.of(60))
+                            .withStatorCurrentLimitEnable(true)))
                     .withEncoderInitialConfigs(new CANcoderConfiguration())
                     .withSteerInertia(KilogramSquareMeters.of(0.01)) // Only used for simulation
                     .withDriveInertia(KilogramSquareMeters.of(0.01)) // Only used for simulation
@@ -116,25 +119,25 @@ public class SwerveFactory {
                 ConstantCreator.createModuleConstants(
                     (int) (long) ((JSONObject) back_left.get("angle_motor")).get("id"),
                     (int) (long) ((JSONObject) back_left.get("drive_motor")).get("id"),
-                    (int) (long) ((JSONObject) front_left.get("encoder")).get("id"),
+                    (int) (long) ((JSONObject) back_left.get("encoder")).get("id"),
                     Rotations.of((double) ((JSONObject) back_left.get("encoder")).get("offset")),
                     Inches.of((double) (long) back_left.get("x")),
-                    Inches.of((double) (long) front_left.get("y")),
+                    Inches.of((double) (long) back_left.get("y")),
                     (boolean) ((JSONObject) back_left.get("drive_motor")).get("inverted"),
                     (boolean) ((JSONObject) back_left.get("angle_motor")).get("inverted"),
-                    (boolean) ((JSONObject) front_left.get("encoder")).get("inverted")
+                    (boolean) ((JSONObject) back_left.get("encoder")).get("inverted")
                 ),
 
                 ConstantCreator.createModuleConstants(
                     (int) (long) ((JSONObject) back_right.get("angle_motor")).get("id"),
                     (int) (long) ((JSONObject) back_right.get("drive_motor")).get("id"),
-                    (int) (long) ((JSONObject) front_left.get("encoder")).get("id"),
+                    (int) (long) ((JSONObject) back_right.get("encoder")).get("id"),
                     Rotations.of((double) ((JSONObject) back_right.get("encoder")).get("offset")),
                     Inches.of((double) (long) back_right.get("x")),
-                    Inches.of((double) (long) front_left.get("y")),
+                    Inches.of((double) (long) back_right.get("y")),
                     (boolean) ((JSONObject) back_right.get("drive_motor")).get("inverted"),
                     (boolean) ((JSONObject) back_right.get("angle_motor")).get("inverted"),
-                    (boolean) ((JSONObject) front_left.get("encoder")).get("inverted")
+                    (boolean) ((JSONObject) back_right.get("encoder")).get("inverted")
                 )
             );
         } catch (FileNotFoundException e) {

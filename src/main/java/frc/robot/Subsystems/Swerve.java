@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.robot.constants.SwerveConstants;
 import frc.robot.other.SwerveFactory;
 import frc.robot.other.Telemetry;
 
@@ -60,11 +61,11 @@ public class Swerve extends SubsystemBase {
             });
                 
         fieldOrientedDrive = new SwerveRequest.FieldCentric()
-            .withDeadband(maxSpeed * 0.1).withRotationalDeadband(maxAngularSpeed * 0.1)
+            .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
         
         robotOrientedDrive = new SwerveRequest.RobotCentric()
-            .withDeadband(maxSpeed * 0.1).withRotationalDeadband(maxAngularSpeed * 0.1)
+            .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
         
         if (RobotBase.isSimulation()) {
