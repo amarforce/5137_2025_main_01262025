@@ -10,11 +10,11 @@ import frc.robot.Subsystems.*;
 
 public class RobotContainer {
 
-  private Vision vision;
+  private Arm arm;
 
   public RobotContainer() {
     
-    vision = new Vision();
+    arm = new Arm();
 
     configureBindings();
   }
