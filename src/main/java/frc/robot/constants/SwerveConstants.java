@@ -16,6 +16,19 @@ public class SwerveConstants {
     public static final double rotation_kI = 0.0;
     public static final double rotation_kD = 0.0;
 
+    public static final Pose2d processor = new Pose2d(new Translation2d(6.25, 0.65), new Rotation2d(3*Math.PI/2));
+
+    public static final Pose2d leftCage = new Pose2d(new Translation2d(8.5, 7.25), new Rotation2d(3*Math.PI/2));
+    public static final Pose2d centerCage = new Pose2d(new Translation2d(8.5, 6.15), new Rotation2d(3*Math.PI/2));
+    public static final Pose2d rightCage = new Pose2d(new Translation2d(8.5, 5.05), new Rotation2d(3*Math.PI/2));
+    public static final Pose2d[] cages = {leftCage, centerCage, rightCage};
+
+    public static final Pose2d stationA = new Pose2d(new Translation2d(1.55, 0.75), new Rotation2d(Math.toRadians(54)));
+    public static final Pose2d stationB = new Pose2d(new Translation2d(0.725, 1.375), new Rotation2d(Math.toRadians(54)));
+    public static final Pose2d stationC = new Pose2d(new Translation2d(0.725, 6.675), new Rotation2d(Math.toRadians(306)));
+    public static final Pose2d stationD = new Pose2d(new Translation2d(1.55, 7.3), new Rotation2d(Math.toRadians(306)));
+    public static final Pose2d[] stations = {stationA, stationB, stationC, stationD};
+
     public static final Pose2d reefA = new Pose2d(new Translation2d(3.15, 4.19), new Rotation2d(0.0));
     public static final Pose2d reefB = new Pose2d(new Translation2d(3.15, 3.86), new Rotation2d(0.0));
     public static final Pose2d reefC = new Pose2d(new Translation2d(3.685, 2.98), new Rotation2d(Math.PI/3));

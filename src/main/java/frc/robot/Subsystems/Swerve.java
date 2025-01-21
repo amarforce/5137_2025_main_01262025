@@ -25,9 +25,11 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModule.ModuleRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -35,6 +37,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -54,6 +57,8 @@ public class Swerve extends SubsystemBase {
 
     private SwerveRequest.FieldCentric fieldOrientedDrive;
     private SwerveRequest.RobotCentric robotOrientedDrive;
+
+    private SendableChooser<Integer> cageChoice;
 
     public Swerve(File file, Vision vision) {
         swerve = SwerveFactory.createSwerve(file);
@@ -90,6 +95,13 @@ public class Swerve extends SubsystemBase {
                 () -> onRedAlliance(),
                 this
         );
+
+        cageChoice = new SendableChooser<Integer>();
+        cageChoice.addOption("Left", 0);
+        cageChoice.addOption("Center", 1);
+        cageChoice.addOption("Right", 2);
+        cageChoice.setDefaultOption("Center", 1);
+        SmartDashboard.putData("Cage Choice", cageChoice);
         
         if (RobotBase.isSimulation()) {
             startSimThread();
@@ -153,6 +165,24 @@ public class Swerve extends SubsystemBase {
         path.schedule();
     }
 
+    public Pose2d getClosest(Pose2d[] poses) {
+        Pose2d pose = this.getPose();
+        if (this.onRedAlliance()) {
+            pose = this.invertPose(pose);
+        }
+        int closest = 0;
+        double closest_distance = 100.0;
+        for (int i = 0; i < poses.length; i++) {
+            Transform2d transform = pose.minus(poses[i]);
+            double distance = Math.hypot(transform.getX(), transform.getY());
+            if (distance < closest_distance) {
+                closest_distance = distance;
+                closest = i;
+            }
+        }
+        return poses[closest];
+    }
+
     public Pose2d invertPose(Pose2d pose) {
         return new Pose2d(SwerveConstants.fieldLength - pose.getX(), SwerveConstants.fieldWidth - pose.getY(), pose.getRotation().rotateBy(Rotation2d.k180deg));
     }
@@ -163,6 +193,10 @@ public class Swerve extends SubsystemBase {
                 return alliance.get() == DriverStation.Alliance.Red;
             }
         return false;
+    }
+
+    public int getCage() {
+        return cageChoice.getSelected();
     }
 
     public void resetGyro() {
@@ -177,7 +211,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void lock() {
-        setControl(new SwerveRequest.PointWheelsAt().withModuleDirection(new Rotation2d(0, 0)));
+        //TODO: Add this
     }
 
     @Override
