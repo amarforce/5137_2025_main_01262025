@@ -25,7 +25,6 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.swerve.SwerveModule.ModuleRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -232,6 +231,7 @@ public class Swerve extends SubsystemBase {
         }
 
         field.setRobotPose(this.getPose());
+        vision.updateSim(this.getPose());
     }
 
     // CTRE Generated SysId Routines
