@@ -35,6 +35,9 @@ public class Vision extends SubsystemBase {
     private SimCameraProperties frontCameraProp;
     private PhotonCameraSim frontCameraSim;
 
+    private SimCameraProperties leftCameraProp;
+    private PhotonCameraSim leftCameraSim;
+
     public Vision() {
         fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
@@ -57,8 +60,17 @@ public class Vision extends SubsystemBase {
         frontCameraSim = new PhotonCameraSim(frontCamera, frontCameraProp);
         visionSim.addCamera(frontCameraSim, VisionConstants.robotToFrontCamera);
 
+        leftCameraProp = new SimCameraProperties();
+        leftCameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
+        leftCameraProp.setFPS(50);
+        leftCameraProp.setAvgLatencyMs(35);
+        leftCameraProp.setLatencyStdDevMs(5);
+        leftCameraSim = new PhotonCameraSim(leftCamera, leftCameraProp);
+        visionSim.addCamera(leftCameraSim, VisionConstants.robotToLeftCamera);
+
         if (Robot.isSimulation()) {
             frontCameraSim.enableDrawWireframe(true);
+            leftCameraSim.enableDrawWireframe(true);
         }
     }
 
