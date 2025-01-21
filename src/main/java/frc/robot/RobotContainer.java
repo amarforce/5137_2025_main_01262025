@@ -47,6 +47,10 @@ public class RobotContainer {
 
         driver.cross().whileTrue(swerveCommands.lock());
 
+        driver.triangle().onTrue(swerveCommands.driveToStation());
+        driver.square().onTrue(swerveCommands.driveToCage());
+        driver.circle().onTrue(swerveCommands.driveToProcessor());
+
         driver.povLeft().onTrue(swerveCommands.driveToReefLeft());
         driver.povUp().onTrue(swerveCommands.driveToReefCenter());
         driver.povRight().onTrue(swerveCommands.driveToReefRight());
