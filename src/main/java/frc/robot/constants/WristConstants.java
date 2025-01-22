@@ -1,10 +1,9 @@
-package frc.robot.Constants;
+package frc.robot.constants;
 
-public class Wrist_Constants {
+public class WristConstants {
 
     //public static final double maxSupplyCurrent = 40;
     public static final double defaultMotorSpeed = .3;
-    public static final double defaultMotorSpeedIntake = .3;
     public static final double gearRatio= 1.0;
     public static final double jkg = 1.0;
     public static final double wristLength = 1.0;

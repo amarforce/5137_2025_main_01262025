@@ -4,58 +4,42 @@
 
 package frc.robot;
 
-
-
-import frc.robot.Subsystems.*;
-import frc.robot.Commands.*;
-
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 
-
-
 public class RobotContainer {
-
-  private boolean cat = true;
-
-
   private CommandPS5Controller driver;
   private CommandPS5Controller operator;
 
-  private wrist wrist;
-  private intake intake;
+  private Wrist wrist;
+  private Intake intake;
 
-  private Wrist_Commands wrist_Commands;
-  private Intake_Commands intake_Commands;
-
-    
-
-
+  private WristCommands wristCommands;
+  private IntakeCommands intakeCommands;
 
   public RobotContainer() {
     driver = new CommandPS5Controller(0);
     operator = new CommandPS5Controller(1);
-
  
-    wrist = new wrist();
-    intake = new intake();
+    wrist = new Wrist();
+    intake = new Intake();
 
-    wrist_Commands = new Wrist_Commands(wrist);
-    intake_Commands = new Intake_Commands(intake);
+    wristCommands = new WristCommands(wrist);
+    intakeCommands = new IntakeCommands(intake);
+
     configureBindings();
   }
 
-  
-
   private void configureBindings() {
-    
+  operator.R1()
+  .onTrue(wristCommands.wristForward())
+  .onFalse(wristCommands.wristReverse());
 
   operator.L2()
-  .onTrue(wrist_Commands.wristForward());
-
-  operator.L1()
-      .onTrue(wrist_Commands.wristReverse());
+  .onTrue(intakeCommands.intakeReverse());
 
   }
 

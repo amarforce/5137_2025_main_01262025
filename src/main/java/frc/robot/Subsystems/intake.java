@@ -1,15 +1,15 @@
-package frc.robot.Subsystems;
+package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class intake extends SubsystemBase {
+public class Intake extends SubsystemBase {
     private SparkMax intakeMotor;
 
-    public intake(){
-        intakeMotor = new SparkMax(5, MotorType.kBrushless);
+    public Intake(){
+        intakeMotor = new SparkMax(25, MotorType.kBrushless);
     }
 
     public void setIntakeSpeed(double speed){
@@ -17,8 +17,6 @@ public class intake extends SubsystemBase {
     }
 
     public void stopIntakeMotor(){
-        intakeMotor.set(0.0);
         intakeMotor.stopMotor();
-        
     }
 }
