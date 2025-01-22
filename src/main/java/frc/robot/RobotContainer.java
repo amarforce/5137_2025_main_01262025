@@ -26,8 +26,8 @@ public class RobotContainer {
   private wrist wrist;
   private intake intake;
 
-  private wristCommands wristCommands;
-  private intakeCommands intakeCommands;
+  private Wrist_Commands wrist_Commands;
+  private Intake_Commands intake_Commands;
 
     
 
@@ -41,8 +41,8 @@ public class RobotContainer {
     wrist = new wrist();
     intake = new intake();
 
-    wristCommands = new wristCommands(wrist);
-    intakeCommands = new intakeCommands(intake);
+    wrist_Commands = new Wrist_Commands(wrist);
+    intake_Commands = new Intake_Commands(intake);
     configureBindings();
   }
 
@@ -52,10 +52,10 @@ public class RobotContainer {
     
 
   operator.L2()
-  .onTrue(wristCommands.wristForward());
+  .onTrue(wrist_Commands.wristForward());
 
   operator.L1()
-      .onTrue(wristCommands.wristReverse());
+      .onTrue(wrist_Commands.wristReverse());
 
   }
 
