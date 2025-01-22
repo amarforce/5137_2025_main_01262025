@@ -1,14 +1,4 @@
 {
-  "Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
-  "System Joysticks": {
-    "window": {
-      "visible": false
-    }
-  },
   "keyboardJoysticks": [
     {
       "axisConfig": [
@@ -99,6 +89,9 @@
     }
   ],
   "robotJoysticks": [
+    {
+      "guid": "030000004c050000e60c000000010000"
+    },
     {
       "guid": "030000004c050000e60c000000010000"
     }

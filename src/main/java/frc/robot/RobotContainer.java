@@ -102,6 +102,8 @@ public class RobotContainer {
 
 		elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
 
+		arm.setDefaultCommand(armCommands.setSpeed(() -> operator.getRightX()));
+
 		operator.triangle()
 			.onTrue(elevatorCommands.moveToL4())
 			.onTrue(armCommands.moveToL4());
