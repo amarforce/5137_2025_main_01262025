@@ -22,9 +22,13 @@ public class RobotContainer {
   private Vision vision;
   private Swerve swerve;
   private Elevator elevator;
+  private Wrist wrist;
+  private Intake intake;
 
   private SwerveCommands swerveCommands;
   private ElevatorCommands elevatorCommands;
+  private WristCommands wristCommands;
+  private IntakeCommands intakeCommands;
 
   private Reef reef;
 
@@ -35,9 +39,13 @@ public class RobotContainer {
     vision = new Vision();
     swerve = new Swerve(new File(Filesystem.getDeployDirectory(),"swerve.json"), vision);
     elevator = new Elevator();
+    wrist = new Wrist();
+    intake = new Intake();
 
     swerveCommands = new SwerveCommands(swerve);
     elevatorCommands = new ElevatorCommands(elevator);
+    wristCommands = new WristCommands(wrist);
+    intakeCommands = new IntakeCommands(intake);
 
     reef = new Reef();
     SmartDashboard.putData("Reef", reef);
@@ -89,6 +97,15 @@ public class RobotContainer {
     operator.circle().onTrue(elevatorCommands.moveToL3());
     operator.square().onTrue(elevatorCommands.moveToL2());
     operator.cross().onTrue(elevatorCommands.moveToL1());
+
+    operator.R1().onTrue(wristCommands.wristForward())
+    .onFalse(wristCommands.wristReverse());
+
+    operator.L2().onTrue(intakeCommands.intakeReverse())
+    .onFalse(intakeCommands.stop());
+
+    operator.R2().onTrue(intakeCommands.intakeForward())
+    .onFalse(intakeCommands.stop());
   }
 
   public Command getAutonomousCommand() {
