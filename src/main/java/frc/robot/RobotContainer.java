@@ -1,5 +1,6 @@
 package frc.robot;
 
+
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
@@ -26,12 +27,14 @@ public class RobotContainer {
 	private Arm arm;
 	private Wrist wrist;
 	private Intake intake;
+  private Hang hang;
 
 	private SwerveCommands swerveCommands;
 	private ElevatorCommands elevatorCommands;
 	private ArmCommands armCommands;
 	private WristCommands wristCommands;
 	private IntakeCommands intakeCommands;
+  private HangCommand hangCommand;
 
 	private Reef reef;
 
@@ -45,12 +48,14 @@ public class RobotContainer {
 		arm = new Arm();
 		wrist = new Wrist();
 		intake = new Intake();
+    hang = new Hang();
 
 		swerveCommands = new SwerveCommands(swerve);
 		elevatorCommands = new ElevatorCommands(elevator);
 		armCommands = new ArmCommands(arm);
 		wristCommands = new WristCommands(wrist);
 		intakeCommands = new IntakeCommands(intake);
+    hangCommand = new HangCommand(hang);
 
 		reef = new Reef();
 		SmartDashboard.putData("Reef", reef);
@@ -95,7 +100,6 @@ public class RobotContainer {
 
 		// Operator Bindings
 
-		//elevator.setManualControl(true);
 		elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
 
 		operator.triangle()
@@ -125,6 +129,9 @@ public class RobotContainer {
 		operator.R2()
 			.onTrue(intakeCommands.intakeForward())
 			.onFalse(intakeCommands.stop());
+    
+    operator.touchpad()
+      .onTrue(hangCommand);
 	}
 
 	public Command getAutonomousCommand() {
