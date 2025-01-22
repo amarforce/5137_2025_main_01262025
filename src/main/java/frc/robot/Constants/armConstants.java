@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-public class armConstants{
+public class ArmConstants{
 
     public static final double armSpeed = 3.0;
     public static final int motorId  = 1;

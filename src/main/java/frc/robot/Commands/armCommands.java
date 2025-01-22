@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.Arm;
-import frc.robot.constants.armConstants;
+import frc.robot.constants.ArmConstants;
 
 
-public class armCommands{
+public class ArmCommands{
      Arm arm;
-        public armCommands(Arm arm) {
+        public ArmCommands(Arm arm) {
             this.arm = arm;
         }
    
@@ -26,15 +26,15 @@ public class armCommands{
         //set to level commands
 
         public Command move2L1() {
-            return new InstantCommand(() -> arm.setGoal(armConstants.goal1), arm);
+            return new InstantCommand(() -> arm.setGoal(ArmConstants.goal1), arm);
         }
         public Command move2L2() {
-            return new InstantCommand(() -> arm.setGoal(armConstants.goal2), arm);
+            return new InstantCommand(() -> arm.setGoal(ArmConstants.goal2), arm);
         }
         public Command move2L3() {
-            return new InstantCommand(() -> arm.setGoal(armConstants.goal3), arm);
+            return new InstantCommand(() -> arm.setGoal(ArmConstants.goal3), arm);
         }
         public Command move2L4() {
-            return new InstantCommand(() -> arm.setGoal(armConstants.goal4), arm);
+            return new InstantCommand(() -> arm.setGoal(ArmConstants.goal4), arm);
         }
 }
