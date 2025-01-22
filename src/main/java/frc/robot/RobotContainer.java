@@ -1,79 +1,97 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import java.io.File;
 
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
+import frc.robot.elastic.*;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 
 public class RobotContainer {
-    private final CommandPS5Controller driver = new CommandPS5Controller(0);
+  private CommandPS5Controller driver;
+  private CommandPS5Controller operator;
 
-    private Vision vision;
-    private Swerve swerve;
+  private Vision vision;
+  private Swerve swerve;
+  private Elevator elevator;
 
-    private SwerveCommands swerveCommands;
+  private SwerveCommands swerveCommands;
+  private ElevatorCommands elevatorCommands;
 
-    public RobotContainer() {
+  private Reef reef;
 
-      vision = new Vision();
-      swerve = new Swerve(new File(Filesystem.getDeployDirectory(),"swerve.json"), vision);
+  public RobotContainer() {
+    driver = new CommandPS5Controller(0);
+    operator = new CommandPS5Controller(1);
 
-      swerveCommands = new SwerveCommands(swerve);
+    vision = new Vision();
+    swerve = new Swerve(new File(Filesystem.getDeployDirectory(),"swerve.json"), vision);
+    elevator = new Elevator();
 
-      configureBindings();
-    }
+    swerveCommands = new SwerveCommands(swerve);
+    elevatorCommands = new ElevatorCommands(elevator);
 
-    private void configureBindings() {
-        // Driver Bindings
+    reef = new Reef();
+    SmartDashboard.putData("Reef", reef);
 
-        swerve.setDefaultCommand(
-            swerveCommands.drive(
-                () -> -driver.getLeftY(),
-                () -> -driver.getLeftX(),
-                () -> -driver.getRightX(),
-                () -> driver.R1().negate().getAsBoolean())
-        );
+    configureBindings();
+  }
 
-        driver.cross().whileTrue(swerveCommands.lock());
+  private void configureBindings() {
+    // Driver Bindings
 
-        driver.triangle().onTrue(swerveCommands.driveToStation());
-        driver.square().onTrue(swerveCommands.driveToCage());
-        driver.circle().onTrue(swerveCommands.driveToProcessor());
+    swerve.setDefaultCommand(
+        swerveCommands.drive(
+            () -> -driver.getLeftY(),
+            () -> -driver.getLeftX(),
+            () -> -driver.getRightX(),
+            () -> driver.R1().negate().getAsBoolean())
+    );
 
-        driver.povLeft().onTrue(swerveCommands.driveToReefLeft());
-        driver.povUp().onTrue(swerveCommands.driveToReefCenter());
-        driver.povRight().onTrue(swerveCommands.driveToReefRight());
+    driver.cross().whileTrue(swerveCommands.lock());
 
-        driver.options().onTrue(swerveCommands.resetGyro());
+    driver.triangle().onTrue(swerveCommands.driveToStation());
+    driver.square().onTrue(swerveCommands.driveToCage());
+    driver.circle().onTrue(swerveCommands.driveToProcessor());
 
-        /*
-        driver.povUp().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineTranslation)));
-        driver.povLeft().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineSteer)));
-        driver.povRight().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineRotation)));
-        driver.options().and(driver.povDown().negate()).whileTrue(swerveCommands.sysIdDynamic(Direction.kForward));
-        driver.options().and(driver.povDown()).whileTrue(swerveCommands.sysIdDynamic(Direction.kForward));
-        driver.create().and(driver.povDown().negate()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
-        driver.create().and(driver.povDown()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
-        */
+    driver.povLeft().onTrue(swerveCommands.driveToReefLeft());
+    driver.povUp().onTrue(swerveCommands.driveToReefCenter());
+    driver.povRight().onTrue(swerveCommands.driveToReefRight());
 
-        driver.touchpad().onTrue(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
+    driver.options().onTrue(swerveCommands.resetGyro());
 
-        // reset the field-centric heading on left bumper press
-        //joystick.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-    }
+    /*
+    driver.povUp().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineTranslation)));
+    driver.povLeft().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineSteer)));
+    driver.povRight().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineRotation)));
+    driver.options().and(driver.povDown().negate()).whileTrue(swerveCommands.sysIdDynamic(Direction.kForward));
+    driver.options().and(driver.povDown()).whileTrue(swerveCommands.sysIdDynamic(Direction.kForward));
+    driver.create().and(driver.povDown().negate()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
+    driver.create().and(driver.povDown()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
+    */
 
-    public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
-    }
+    driver.touchpad().onTrue(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
+
+    // Operator Bindings
+
+    //elevator.setManualControl(true);
+    elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
+
+    operator.triangle().onTrue(elevatorCommands.moveToL4());
+    operator.circle().onTrue(elevatorCommands.moveToL3());
+    operator.square().onTrue(elevatorCommands.moveToL2());
+    operator.cross().onTrue(elevatorCommands.moveToL1());
+  }
+
+  public Command getAutonomousCommand() {
+    return Commands.print("No autonomous command configured");
+  }
 }
