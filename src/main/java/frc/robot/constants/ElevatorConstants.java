@@ -1,8 +1,8 @@
 package frc.robot.constants;
 public class ElevatorConstants {
     // Motor IDs
-    public static final int leftMotorId = 1;
-    public static final int rightMotorId = 2;
+    public static final int leftMotorId = 21; // TODO: Change to 1
+    public static final int rightMotorId = 22; // TODO: Change to 2
 
     // Encoder transform
     public static final double elevatorOffset = 0;
