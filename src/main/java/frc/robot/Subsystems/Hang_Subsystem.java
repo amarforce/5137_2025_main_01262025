@@ -1,4 +1,5 @@
 package frc.robot.Subsystems;
+import frc.robot.ClimbSequentialCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Hang_Constants.Pneumatics;
 import frc.robot.Constants.Hang_Constants;
@@ -11,28 +12,24 @@ import edu.wpi.first.wpilibj.Compressor;
 
 
 
+
 public class Hang_Subsystem extends SubsystemBase {
     
     private final Solenoid clamp_solenoid;
     private final Solenoid climb_solenoid;
+    private final Compressor compressor;
 
-    
-    
-    
-    public void PneumaticsSubsystem() {
-        final Solenoid clamp_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
-        final Solenoid climb_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
-
-        
-    }
-
-    public double initializeCompressor() {
-        final Compressor compressor = new Compressor(PneumaticsModuleType.REVPH);
+    public Hang_Subsystem(){
+        clamp_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 0);
+        climb_solenoid = new Solenoid(PneumaticsModuleType.REVPH, 1);
+        compressor = new Compressor(PneumaticsModuleType.REVPH);
         compressor.enableAnalog(70, 120);
-        return compressor.getPressure();
 
-        
+
     }
+    
+    
+    
 
     public void clampActivate(){
         clamp_solenoid.set(true);
