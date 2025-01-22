@@ -56,6 +56,7 @@ public class Swerve extends SubsystemBase {
 
     private SwerveRequest.FieldCentric fieldOrientedDrive;
     private SwerveRequest.RobotCentric robotOrientedDrive;
+    private SwerveRequest.SwerveDriveBrake lock;
 
     private SendableChooser<Integer> cageChoice;
 
@@ -73,10 +74,12 @@ public class Swerve extends SubsystemBase {
         robotOrientedDrive = new SwerveRequest.RobotCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+        
+        lock = new SwerveRequest.SwerveDriveBrake();
 
         RobotConfig config;
         try {
-        config = RobotConfig.fromGUISettings();
+            config = RobotConfig.fromGUISettings();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -210,7 +213,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void lock() {
-        //TODO: Add this
+        this.setControl(lock);
     }
 
     @Override
