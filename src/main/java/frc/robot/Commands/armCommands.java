@@ -7,8 +7,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.Arm;
 import frc.robot.constants.ArmConstants;
 
-
-public class ArmCommands{
+public class ArmCommands {
 
     private Arm arm;
 
