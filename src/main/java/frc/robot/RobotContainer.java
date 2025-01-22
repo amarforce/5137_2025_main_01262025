@@ -15,6 +15,7 @@ import frc.robot.elastic.*;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 
+@SuppressWarnings("unused")
 public class RobotContainer {
 	private CommandPS5Controller driver;
 	private CommandPS5Controller operator;
@@ -22,11 +23,13 @@ public class RobotContainer {
 	private Vision vision;
 	private Swerve swerve;
 	private Elevator elevator;
+	private Arm arm;
 	private Wrist wrist;
 	private Intake intake;
 
 	private SwerveCommands swerveCommands;
 	private ElevatorCommands elevatorCommands;
+	private ArmCommands armCommands;
 	private WristCommands wristCommands;
 	private IntakeCommands intakeCommands;
 
@@ -39,11 +42,13 @@ public class RobotContainer {
 		vision = new Vision();
 		swerve = new Swerve(new File(Filesystem.getDeployDirectory(),"swerve.json"), vision);
 		elevator = new Elevator();
+		arm = new Arm();
 		wrist = new Wrist();
 		intake = new Intake();
 
 		swerveCommands = new SwerveCommands(swerve);
 		elevatorCommands = new ElevatorCommands(elevator);
+		armCommands = new ArmCommands(arm);
 		wristCommands = new WristCommands(wrist);
 		intakeCommands = new IntakeCommands(intake);
 
@@ -93,19 +98,33 @@ public class RobotContainer {
 		//elevator.setManualControl(true);
 		elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
 
-		operator.triangle().onTrue(elevatorCommands.moveToL4());
-		operator.circle().onTrue(elevatorCommands.moveToL3());
-		operator.square().onTrue(elevatorCommands.moveToL2());
-		operator.cross().onTrue(elevatorCommands.moveToL1());
+		operator.triangle()
+			.onTrue(elevatorCommands.moveToL4())
+			.onTrue(armCommands.moveToL4());
 
-		operator.R1().onTrue(wristCommands.wristForward())
-		.onFalse(wristCommands.wristReverse());
+		operator.circle()
+			.onTrue(elevatorCommands.moveToL3())
+			.onTrue(armCommands.moveToL3());
 
-		operator.L2().onTrue(intakeCommands.intakeReverse())
-		.onFalse(intakeCommands.stop());
+		operator.square()
+			.onTrue(elevatorCommands.moveToL2())
+			.onTrue(armCommands.moveToL2());
 
-		operator.R2().onTrue(intakeCommands.intakeForward())
-		.onFalse(intakeCommands.stop());
+		operator.cross()
+			.onTrue(elevatorCommands.moveToL1())
+			.onTrue(armCommands.moveToL1());
+
+		operator.R1()
+			.onTrue(wristCommands.wristForward())
+			.onFalse(wristCommands.wristReverse());
+
+		operator.L2()
+			.onTrue(intakeCommands.intakeReverse())
+			.onFalse(intakeCommands.stop());
+
+		operator.R2()
+			.onTrue(intakeCommands.intakeForward())
+			.onFalse(intakeCommands.stop());
 	}
 
 	public Command getAutonomousCommand() {
