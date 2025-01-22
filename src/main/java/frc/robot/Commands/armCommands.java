@@ -25,16 +25,16 @@ public class ArmCommands{
 
         //set to level commands
 
-        public Command move2L1() {
+        public Command moveToL1() {
             return new InstantCommand(() -> arm.setGoal(ArmConstants.goal1), arm);
         }
-        public Command move2L2() {
+        public Command moveToL2() {
             return new InstantCommand(() -> arm.setGoal(ArmConstants.goal2), arm);
         }
-        public Command move2L3() {
+        public Command moveToL3() {
             return new InstantCommand(() -> arm.setGoal(ArmConstants.goal3), arm);
         }
-        public Command move2L4() {
+        public Command moveToL4() {
             return new InstantCommand(() -> arm.setGoal(ArmConstants.goal4), arm);
         }
 }
