@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import frc.robot.constants.WristConstants;
+
 //import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 //import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -7,7 +9,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.WristConstants;
 //import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
