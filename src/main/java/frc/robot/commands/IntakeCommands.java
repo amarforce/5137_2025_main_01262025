@@ -11,13 +11,13 @@ public class IntakeCommands {
         this.intake = intake;
     }
     public InstantCommand stop(){
-        return new InstantCommand(() -> intake.stopIntakeMotor());
+        return new InstantCommand(() -> intake.stop());
     }
 
     public InstantCommand intakeForward(){
-        return new InstantCommand(() -> intake.setIntakeSpeed(IntakeConstants.defaultMotorSpeedIntake), intake);
+        return new InstantCommand(() -> intake.setSpeed(IntakeConstants.defaultMotorSpeedIntake), intake);
     }
     public InstantCommand intakeReverse(){
-        return new InstantCommand(() -> intake.setIntakeSpeed(-IntakeConstants.defaultMotorSpeedIntake), intake);
+        return new InstantCommand(() -> intake.setSpeed(-IntakeConstants.defaultMotorSpeedIntake), intake);
     }
 }

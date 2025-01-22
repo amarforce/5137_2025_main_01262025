@@ -59,12 +59,10 @@ public class Arm extends SubsystemBase{
     private TalonFXSimState armMotorSim = armMotor.getSimState();
         
     public Arm() {
-        
         motorOutput = new MotorOutputConfigs();
         armPID = new PIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kP);
         feedFor = new ArmFeedforward(ArmConstants.ks, ArmConstants.kg, ArmConstants.kv);
 
-   
         armPID.setTolerance(ArmConstants.tolerance);
         Shuffleboard.getTab("Arm Controller").add(armPID);
     }
@@ -73,6 +71,7 @@ public class Arm extends SubsystemBase{
         motorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         armMotor.getConfigurator().apply(motorOutput);
     }
+
     public void setArmDown() {
         motorOutput.Inverted = InvertedValue.Clockwise_Positive;
         armMotor.getConfigurator().apply(motorOutput);
@@ -89,18 +88,23 @@ public class Arm extends SubsystemBase{
     public void setGoal(double newGoal){
         goal = newGoal;
     }
+
     public double getGoal(){
         return goal;
     }
+
     public void setVoltage(Voltage v) {
         armMotor.setVoltage(v.magnitude());
     }
+
     public double getVelocity() {
         return armMotor.getVelocity().getValueAsDouble()/ArmConstants.gearRatio;
     }
+
     public void moveToLevel(double goal) {
         armPID.calculate(goal);
     } 
+
     public void telemetry() {
         SmartDashboard.putNumber("Arm pose", armSim.getAngleRads());
         SmartDashboard.putNumber("Arm Velocity", armSim.getVelocityRadPerSec());
@@ -129,7 +133,4 @@ public class Arm extends SubsystemBase{
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
 
     }
-
-
 }
-

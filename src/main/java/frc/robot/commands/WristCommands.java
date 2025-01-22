@@ -11,7 +11,7 @@ public class WristCommands {
     }
 
     public InstantCommand stop(){
-        return new InstantCommand(() -> wrist.stopWristMotor());
+        return new InstantCommand(() -> wrist.stop());
     }
 
     public InstantCommand wristForward(){

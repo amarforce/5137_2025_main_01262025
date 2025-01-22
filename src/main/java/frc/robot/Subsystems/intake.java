@@ -12,11 +12,11 @@ public class Intake extends SubsystemBase {
         intakeMotor = new SparkMax(25, MotorType.kBrushless);
     }
 
-    public void setIntakeSpeed(double speed){
+    public void setSpeed(double speed){
         intakeMotor.set(speed);
     }
 
-    public void stopIntakeMotor(){
+    public void stop(){
         intakeMotor.stopMotor();
     }
 }

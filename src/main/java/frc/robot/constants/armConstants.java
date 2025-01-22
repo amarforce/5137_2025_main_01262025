@@ -3,7 +3,7 @@ package frc.robot.constants;
 public class ArmConstants {
 
     public static final double armSpeed = 3.0;
-    public static final int motorId  = 1;
+    public static final int motorId  = 20;
     public static double kP = 0; // enter
     public static double kI = 0; // enter
     public static double kD = 0; // enter

@@ -30,11 +30,11 @@ public class Wrist extends SubsystemBase{
 
     private SingleJointedArmSim wristSim = new SingleJointedArmSim(DCMotor.getFalcon500(1), WristConstants.gearRatio, WristConstants.jkg, WristConstants.wristLength, WristConstants.min, WristConstants.max, true, WristConstants.min);
 
-    public void setWristSpeed(double speed){
+    public void setSpeed(double speed){
         wristMotor.set(speed);
     }
     
-    public void stopWristMotor(){
+    public void stop(){
         wristMotor.set(0.0);
         wristMotor.setNeutralMode(NeutralModeValue.Brake);
     }
