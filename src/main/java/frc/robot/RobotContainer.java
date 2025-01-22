@@ -1,7 +1,7 @@
 package frc.robot;
 
-
 import java.io.File;
+import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,10 +9,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.elastic.*;
+import frc.robot.other.AutoFactory;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 
@@ -27,17 +31,28 @@ public class RobotContainer {
 	private Arm arm;
 	private Wrist wrist;
 	private Intake intake;
-  private Hang hang;
+  	private Hang hang;
 
 	private SwerveCommands swerveCommands;
 	private ElevatorCommands elevatorCommands;
 	private ArmCommands armCommands;
 	private WristCommands wristCommands;
 	private IntakeCommands intakeCommands;
-  private HangCommand hangCommand;
+  	private HangCommand hangCommand;
+
+	private Supplier<Command> scoreL4;
+	private Supplier<Command> scoreL3;
+	private Supplier<Command> scoreL2;
+	private Supplier<Command> scoreL1;
+	private Supplier<Command> removeAlgae;
+	private Supplier<Command> groundIntake;
+	private Supplier<Command> sourceIntake;
 
 	private Reef reef;
 
+	private AutoFactory autoFactory;
+
+	@SuppressWarnings("unchecked")
 	public RobotContainer() {
 		driver = new CommandPS5Controller(0);
 		operator = new CommandPS5Controller(1);
@@ -48,19 +63,80 @@ public class RobotContainer {
 		arm = new Arm();
 		wrist = new Wrist();
 		intake = new Intake();
-    hang = new Hang();
+    	hang = new Hang();
 
 		swerveCommands = new SwerveCommands(swerve);
 		elevatorCommands = new ElevatorCommands(elevator);
 		armCommands = new ArmCommands(arm);
 		wristCommands = new WristCommands(wrist);
 		intakeCommands = new IntakeCommands(intake);
-    hangCommand = new HangCommand(hang);
+    	hangCommand = new HangCommand(hang);
 
 		reef = new Reef();
 		SmartDashboard.putData("Reef", reef);
 
+		configureCommands();
 		configureBindings();
+
+		autoFactory = new AutoFactory(scoreL4, scoreL3, scoreL2, scoreL1, removeAlgae, groundIntake, sourceIntake);
+	}
+
+	private void configureCommands() { //TODO: Configure these to retract elevator/arm, add wrist/intake commands, and add pickup methods
+		scoreL4 = () ->
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL4(),
+				armCommands.moveToL4()
+			)
+		);
+
+		scoreL3 = () -> 
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL3(),
+				armCommands.moveToL3()
+			)
+		);
+
+		scoreL2 = () -> 
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL2(),
+				armCommands.moveToL2()
+			)
+		);
+
+		scoreL1 = () -> 
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL1(),
+				armCommands.moveToL1()
+			)
+		);
+
+		removeAlgae = () ->
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL3(), //TODO: Make algae positions
+				armCommands.moveToL3()
+			)
+		);
+
+		groundIntake = () ->
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL1(),
+				armCommands.moveToL1()
+			)
+		);
+
+		sourceIntake = () ->
+		new SequentialCommandGroup (
+			new ParallelCommandGroup(
+				elevatorCommands.moveToL3(),
+				armCommands.moveToL3()
+			)
+		);
 	}
 
 	private void configureBindings() {
@@ -105,20 +181,16 @@ public class RobotContainer {
 		arm.setDefaultCommand(armCommands.setSpeed(() -> operator.getRightX()));
 
 		operator.triangle()
-			.onTrue(elevatorCommands.moveToL4())
-			.onTrue(armCommands.moveToL4());
+			.onTrue(scoreL4.get());
 
 		operator.circle()
-			.onTrue(elevatorCommands.moveToL3())
-			.onTrue(armCommands.moveToL3());
+			.onTrue(scoreL3.get());
 
 		operator.square()
-			.onTrue(elevatorCommands.moveToL2())
-			.onTrue(armCommands.moveToL2());
+			.onTrue(scoreL2.get());
 
 		operator.cross()
-			.onTrue(elevatorCommands.moveToL1())
-			.onTrue(armCommands.moveToL1());
+			.onTrue(scoreL1.get());
 
 		operator.R1()
 			.onTrue(wristCommands.wristForward())
@@ -132,11 +204,11 @@ public class RobotContainer {
 			.onTrue(intakeCommands.intakeForward())
 			.onFalse(intakeCommands.stop());
     
-    operator.touchpad()
-      .onTrue(hangCommand);
+		operator.touchpad()
+		.onTrue(hangCommand);
 	}
 
 	public Command getAutonomousCommand() {
-		return Commands.print("No autonomous command configured");
+		return autoFactory.getAuto();
 	}
 }

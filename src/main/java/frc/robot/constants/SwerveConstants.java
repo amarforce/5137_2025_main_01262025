@@ -1,5 +1,12 @@
 package frc.robot.constants;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+
+import com.pathplanner.lib.path.PathConstraints;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,6 +23,12 @@ public class SwerveConstants {
     public static final double rotation_kI = 0.0;
     public static final double rotation_kD = 0.0;
 
+    public static final PathConstraints constaints = new PathConstraints(
+        MetersPerSecond.of(5.0),
+        MetersPerSecondPerSecond.of(5.0),
+        RadiansPerSecond.of(1.5*Math.PI),
+        RadiansPerSecondPerSecond.of(Math.PI));
+
     public static final Pose2d processor = new Pose2d(new Translation2d(6.25, 0.65), new Rotation2d(3*Math.PI/2));
 
     public static final Pose2d leftCage = new Pose2d(new Translation2d(8.5, 7.25), new Rotation2d(3*Math.PI/2));
@@ -28,6 +41,10 @@ public class SwerveConstants {
     public static final Pose2d stationC = new Pose2d(new Translation2d(0.725, 6.675), new Rotation2d(Math.toRadians(306)));
     public static final Pose2d stationD = new Pose2d(new Translation2d(1.55, 7.3), new Rotation2d(Math.toRadians(306)));
     public static final Pose2d[] stations = {stationA, stationB, stationC, stationD};
+
+    public static final Pose2d leftPickup = new Pose2d(new Translation2d(1.8, 5.825), new Rotation2d(0.0));
+    public static final Pose2d centerPickup = new Pose2d(new Translation2d(1.8, 4.025), new Rotation2d(0.0));
+    public static final Pose2d rightPickup = new Pose2d(new Translation2d(1.8, 2.225), new Rotation2d(0.0));
 
     public static final Pose2d reefA = new Pose2d(new Translation2d(3.15, 4.19), new Rotation2d(0.0));
     public static final Pose2d reefB = new Pose2d(new Translation2d(3.15, 3.86), new Rotation2d(0.0));
