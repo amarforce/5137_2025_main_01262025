@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Subsystems.Hang_Subsystem;
 
 public class ClimbSequentialCommand extends SequentialCommandGroup {
-    public ClimbSequentialCommand(Hang_Subsystem hang_Subsystem){
+    public Climb       `a11SequentialCommand(Hang_Subsystem hang_Subsystem){
         addCommands(
 
             Commands.runOnce(()-> hang_Subsystem.clampDeactivate()),
