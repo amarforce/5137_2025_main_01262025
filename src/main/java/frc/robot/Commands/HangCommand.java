@@ -1,12 +1,12 @@
-package frc.robot.Commands;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Subsystems.Hang_Subsystem;
+import frc.robot.subsystems.Hang;
 
-public class ClimbSequentialCommand extends SequentialCommandGroup {
-    public ClimbSequentialCommand(Hang_Subsystem hang_Subsystem){
+public class HangCommand extends SequentialCommandGroup {
+    public HangCommand(Hang hang_Subsystem){
         addCommands(
 
             Commands.runOnce(()-> hang_Subsystem.clampDeactivate()),

@@ -1,4 +1,4 @@
-package frc.robot.Constants;
+package frc.robot.constants;
 
 public class Hang_Constants {
     public static final class Pneumatics {
