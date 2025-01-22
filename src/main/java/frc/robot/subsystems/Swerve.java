@@ -22,7 +22,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
@@ -157,12 +156,7 @@ public class Swerve extends SubsystemBase {
         if (onRedAlliance()) {
             pose = invertPose(pose);
         }
-        Command path = AutoBuilder.pathfindToPose(pose, new PathConstraints(
-            MetersPerSecond.of(5.0),
-            MetersPerSecondPerSecond.of(5.0),
-            RadiansPerSecond.of(1.5*Math.PI),
-            RadiansPerSecondPerSecond.of(Math.PI)),
-            MetersPerSecond.of(0.0));
+        Command path = AutoBuilder.pathfindToPose(pose, SwerveConstants.constaints);
         path.addRequirements(this);
         path.schedule();
     }
