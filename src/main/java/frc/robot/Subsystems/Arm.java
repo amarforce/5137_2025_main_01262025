@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.constants.armConstants;
+import frc.robot.constants.ArmConstants;
 
 import static edu.wpi.first.units.Units.Rotations;
 
@@ -30,14 +30,14 @@ import static edu.wpi.first.units.Units.Volts;
 
 public class Arm extends SubsystemBase{
     
-    private TalonFX armMotor = new TalonFX(armConstants.motorId, "rhino");
+    private TalonFX armMotor = new TalonFX(ArmConstants.motorId, "rhino");
     private MotorOutputConfigs motorOutput;
     private PIDController armPID;
     private double goal = 0;
     private final DutyCycleOut request = new DutyCycleOut(0.0);
     private ArmFeedforward feedFor;
     
-    private SingleJointedArmSim armSim = new SingleJointedArmSim(DCMotor.getKrakenX60(1), armConstants.gearRatio, armConstants.jkg, armConstants.armLength, armConstants.min, armConstants.max, true, armConstants.min);
+    private SingleJointedArmSim armSim = new SingleJointedArmSim(DCMotor.getKrakenX60(1), ArmConstants.gearRatio, ArmConstants.jkg, ArmConstants.armLength, ArmConstants.min, ArmConstants.max, true, ArmConstants.min);
 
     public final SysIdRoutine sysIdRoutine =
         new SysIdRoutine(
@@ -61,11 +61,11 @@ public class Arm extends SubsystemBase{
     public Arm() {
         
         motorOutput = new MotorOutputConfigs();
-        armPID = new PIDController(armConstants.kP, armConstants.kI, armConstants.kP);
-        feedFor = new ArmFeedforward(armConstants.ks, armConstants.kg, armConstants.kv);
+        armPID = new PIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kP);
+        feedFor = new ArmFeedforward(ArmConstants.ks, ArmConstants.kg, ArmConstants.kv);
 
    
-        armPID.setTolerance(armConstants.tolerance);
+        armPID.setTolerance(ArmConstants.tolerance);
         Shuffleboard.getTab("Arm Controller").add(armPID);
     }
 
@@ -83,7 +83,7 @@ public class Arm extends SubsystemBase{
     }
     
     public double getPose() {
-        return ((armMotor.getPosition().getValueAsDouble()+armConstants.armOffset)/armConstants.gearRatio);
+        return ((armMotor.getPosition().getValueAsDouble()+ArmConstants.armOffset)/ArmConstants.gearRatio);
     }
     
     public void setGoal(double newGoal){
@@ -96,7 +96,7 @@ public class Arm extends SubsystemBase{
         armMotor.setVoltage(v.magnitude());
     }
     public double getVelocity() {
-        return armMotor.getVelocity().getValueAsDouble()/armConstants.gearRatio;
+        return armMotor.getVelocity().getValueAsDouble()/ArmConstants.gearRatio;
     }
     public void moveToLevel(double goal) {
         armPID.calculate(goal);
@@ -124,8 +124,8 @@ public class Arm extends SubsystemBase{
         armSim.setInputVoltage(armInput);
         armSim.update(0.02);
         double angle = armSim.getAngleRads()/(Math.PI*2);
-        armMotorSim.setRotorVelocity(armSim.getVelocityRadPerSec()/(Math.PI*2)*armConstants.gearRatio);
-        armMotorSim.setRawRotorPosition((angle*armConstants.gearRatio)-armConstants.armOffset);
+        armMotorSim.setRotorVelocity(armSim.getVelocityRadPerSec()/(Math.PI*2)*ArmConstants.gearRatio);
+        armMotorSim.setRawRotorPosition((angle*ArmConstants.gearRatio)-ArmConstants.armOffset);
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
 
     }
