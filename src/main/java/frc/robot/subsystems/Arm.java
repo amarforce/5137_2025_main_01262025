@@ -44,7 +44,7 @@ public class Arm extends SubsystemBase{
             new SysIdRoutine.Mechanism(
                 this::setVoltage,
                 log -> {
-                    log.motor("arm") 
+                    log.motor("arm")
                         .voltage(Volts.of(armMotor.get() * RobotController.getBatteryVoltage()))
                         .angularPosition(Rotations.of(getPose()))
                         .angularVelocity(RotationsPerSecond.of(getVelocity()));
