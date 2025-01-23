@@ -24,6 +24,7 @@ public class VisionConstants {
     public static final Translation2d reefJ = new Translation2d(4.70, 4.80);
     public static final Translation2d reefK = new Translation2d(4.25, 4.80);
     public static final Translation2d reefL = new Translation2d(4.00, 4.60);
+    public static final Translation2d[] reefPositions = {reefA, reefB, reefC, reefD, reefE, reefF, reefG, reefH, reefI, reefJ, reefK, reefL};
 
     public static final double L1 = 0.454;
     public static final double L2 = 0.740;

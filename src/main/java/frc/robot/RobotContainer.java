@@ -208,6 +208,10 @@ public class RobotContainer {
 		.onTrue(hangCommand);
 	}
 
+	public Reef getReef() {
+		return reef;
+	}
+
 	public Command getAutonomousCommand() {
 		return autoFactory.getAuto();
 	}
