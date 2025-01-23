@@ -235,16 +235,18 @@ public class Swerve extends SubsystemBase {
             leftPose.get().timestampSeconds);
         }
 
-        objects.forEach((PhotonTrackedTarget target) -> {
-            Translation3d target3d = vision.getTarget3d(target, VisionConstants.robotToFrontObjectCamera, getPose());
-            if (onRedAlliance()) {
-                target3d = new Translation3d(SwerveConstants.fieldLength - target3d.getX(), SwerveConstants.fieldWidth - target3d.getY(), target3d.getZ());
-            }
-            int x = vision.checkObjectOnReef(target3d);
-            if (x%5 > 0) {
-                Reef.registerCoralPlaced(x/5, x%5);
-            }
-        });
+        if (objects != null) {
+            objects.forEach((PhotonTrackedTarget target) -> {
+                Translation3d target3d = vision.getTarget3d(target, VisionConstants.robotToFrontObjectCamera, getPose());
+                if (onRedAlliance()) {
+                    target3d = new Translation3d(SwerveConstants.fieldLength - target3d.getX(), SwerveConstants.fieldWidth - target3d.getY(), target3d.getZ());
+                }
+                int x = vision.checkObjectOnReef(target3d);
+                if (x%5 > 0) {
+                    Reef.registerCoralPlaced(x/5, x%5);
+                }
+            });
+        }
 
         field.setRobotPose(this.getPose());
         vision.updateSim(this.getPose());
