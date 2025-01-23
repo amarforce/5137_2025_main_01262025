@@ -1,4 +1,5 @@
 package frc.robot.constants;
+
 public class ElevatorConstants {
     // Motor IDs
     public static final int leftMotorId = 21; // TODO: Change to 1
@@ -27,7 +28,8 @@ public class ElevatorConstants {
     public static final double L3goal = 0.8;
     public static final double L4goal = 1.5;
     public static final double intakeGoal = 1.0;
-    public static final double groundIntakeGoal = 0.25;
+    public static final double groundIntakeGoal = 0.5;
+    public static final double defaultPosition = 0.25;
 
     // Simulation constants
     public static final double elevatorGearing = 20.0; // gear ratio
@@ -37,4 +39,8 @@ public class ElevatorConstants {
     public static final double maxHeight = 1.5113; // in meters
     public static final double startingHeight = minHeight; // in meters
     public static final double simPeriod = 0.02;
+
+    // Mech constants
+    public static final double mechWidth = 20;
+    public static final double mechHeight = 50;
 }

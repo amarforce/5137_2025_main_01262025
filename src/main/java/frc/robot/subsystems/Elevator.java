@@ -31,15 +31,14 @@ public class Elevator extends SubsystemBase{
     private TalonFX leftMotor = new TalonFX(ElevatorConstants.leftMotorId, "rhino");
     private TalonFX rightMotor = new TalonFX(ElevatorConstants.rightMotorId, "rhino");
 
-    private PIDController controller;
-
+    private PIDController controller = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
     private ElevatorFeedforward feedforward;
 
     private ElevatorSim elevatorSim=new ElevatorSim(DCMotor.getFalcon500(2), ElevatorConstants.elevatorGearing, ElevatorConstants.carriageMass, ElevatorConstants.drumRadius, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true,ElevatorConstants.startingHeight);
     private TalonFXSimState leftMotorSim=leftMotor.getSimState();
     private TalonFXSimState rightMotorSim=rightMotor.getSimState();
     
-    private double goal = 0;
+    private double goal = ElevatorConstants.defaultPosition;
 
     // Create a new SysId routine for characterizing the shooter.
     public final SysIdRoutine sysIdRoutine = 
@@ -63,12 +62,11 @@ public class Elevator extends SubsystemBase{
                 this));
 
     // Create a Mechanism2d visualization of the elevator
-    private final Mechanism2d mech2d = new Mechanism2d(20, 50);
-    private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", 10, 0);
+    private final Mechanism2d mech2d = new Mechanism2d(ElevatorConstants.mechWidth,ElevatorConstants.mechHeight);
+    private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", ElevatorConstants.mechWidth/2, 0);
     private final MechanismLigament2d elevatorMech2d = mech2dRoot.append(new MechanismLigament2d("Elevator", 0, 90));
 
     public Elevator(){
-        controller = new PIDController(ElevatorConstants.kP,ElevatorConstants.kI,ElevatorConstants.kD);
         feedforward = new ElevatorFeedforward(ElevatorConstants.ks, ElevatorConstants.kg, ElevatorConstants.kv);
 
         var currentConfigs = new MotorOutputConfigs();
@@ -126,7 +124,7 @@ public class Elevator extends SubsystemBase{
         SmartDashboard.putNumber("Elevator Position", elevatorSim.getPositionMeters());
         SmartDashboard.putNumber("Elevator Velocity", getVelocity());
         SmartDashboard.putNumber("Elevator Speed",(leftMotor.get()-rightMotor.get())/2);
-        elevatorMech2d.setLength(elevatorSim.getPositionMeters()*50/ElevatorConstants.maxHeight);
+        elevatorMech2d.setLength(elevatorSim.getPositionMeters()*ElevatorConstants.mechHeight/ElevatorConstants.maxHeight);
         SmartDashboard.putData("Elevator", mech2d);
     }
 
