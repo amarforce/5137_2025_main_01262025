@@ -12,15 +12,15 @@ public class ElevatorConstants {
     public static final double elevatorOffset = 0;
     public static final double metersPerRotation = 0.01397;
 
-    // Feedforward constants
-    public static final double kS = 0.1;
-    public static final double kG = 0.1;
-    public static final double kV = 0.1;
-
     // PID constants
     public static final double kP = 30;
     public static final double kI = 0;
     public static final double kD = 1;
+
+    // Feedforward constants
+    public static final double kS = 0;
+    public static final double kG = 0;
+    public static final double kV = 0;
 
     // Elevator tolerance
     public static final double elevatorTol = 0.1;
@@ -40,7 +40,6 @@ public class ElevatorConstants {
     public static final double drumRadius = metersPerRotation*gearRatio/(2*Math.PI); // in meters
     public static final double minHeight = 0; // in meters
     public static final double maxHeight = 1.27; // in meters
-    public static final double startingHeight = minHeight; // in meters
     public static final double simPeriod = 0.02;
     public static final DCMotor motorSim = DCMotor.getFalcon500(2);
 

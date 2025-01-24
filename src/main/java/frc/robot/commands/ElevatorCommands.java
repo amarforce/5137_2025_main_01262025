@@ -14,12 +14,12 @@ public class ElevatorCommands {
         this.elevator = elevator;
     }
 
-    public Command setSpeed(DoubleSupplier speed){
-        return new InstantCommand(()->elevator.setSpeed(speed.getAsDouble()),elevator);
-    }
-
     public Command setGoal(DoubleSupplier goal){
         return new InstantCommand(()->elevator.setGoal(goal.getAsDouble()),elevator);
+    }
+
+    public Command changeGoal(DoubleSupplier change){
+        return new InstantCommand(()->elevator.setGoal(elevator.getGoal()+change.getAsDouble()),elevator);
     }
 
     public Command moveToL1(){
