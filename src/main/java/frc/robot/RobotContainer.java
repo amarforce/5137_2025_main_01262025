@@ -198,9 +198,9 @@ public class RobotContainer {
 
 		// Operator Bindings
 
-		elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
+		//elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
 
-		arm.setDefaultCommand(armCommands.setSpeed(() -> operator.getRightX()));
+		//arm.setDefaultCommand(armCommands.setSpeed(() -> operator.getRightX()));
 
 		operator.triangle()
 			.onTrue(scoreL4.get());

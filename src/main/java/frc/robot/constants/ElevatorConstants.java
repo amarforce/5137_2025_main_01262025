@@ -1,5 +1,8 @@
 package frc.robot.constants;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+
 public class ElevatorConstants {
     // Motor IDs
     public static final int leftMotorId = 21; // TODO: Change to 1
@@ -32,13 +35,14 @@ public class ElevatorConstants {
     public static final double defaultGoal = 0;
 
     // Simulation constants
-    public static final double elevatorGearing = 20.0; // gear ratio
+    public static final double gearRatio = 20.0; // gear ratio
     public static final double carriageMass = 13.0; // in kg
-    public static final double drumRadius = 0.0445; // in meters
+    public static final double drumRadius = metersPerRotation*gearRatio/(2*Math.PI); // in meters
     public static final double minHeight = 0; // in meters
     public static final double maxHeight = 1.27; // in meters
     public static final double startingHeight = minHeight; // in meters
     public static final double simPeriod = 0.02;
+    public static final DCMotor motorSim = DCMotor.getFalcon500(2);
 
     // Mech constants
     public static final double mechWidth = 20;

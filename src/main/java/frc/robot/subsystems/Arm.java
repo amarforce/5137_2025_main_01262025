@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -31,12 +32,11 @@ import static edu.wpi.first.units.Units.Volts;
 public class Arm extends SubsystemBase{
     
     private TalonFX armMotor = new TalonFX(ArmConstants.motorId, "rhino");
-    private MotorOutputConfigs motorOutput;
-    private PIDController armPID;
+    private PIDController armController = new PIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kP);
+    private ArmFeedforward feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV);
     private double goal = 0;
-    private ArmFeedforward feedFor;
     
-    private SingleJointedArmSim armSim = new SingleJointedArmSim(DCMotor.getKrakenX60(1), ArmConstants.gearRatio, ArmConstants.jkg, ArmConstants.armLength, ArmConstants.min, ArmConstants.max, true, ArmConstants.min);
+    private SingleJointedArmSim armSim = new SingleJointedArmSim(ArmConstants.motorSim, ArmConstants.gearRatio, ArmConstants.jkg, ArmConstants.armLength, ArmConstants.min, ArmConstants.max, true, ArmConstants.min);
 
     public final SysIdRoutine sysIdRoutine =
         new SysIdRoutine(
@@ -46,42 +46,32 @@ public class Arm extends SubsystemBase{
                 log -> {
                     log.motor("arm")
                         .voltage(Volts.of(armMotor.get() * RobotController.getBatteryVoltage()))
-                        .angularPosition(Rotations.of(getPose()))
+                        .angularPosition(Rotations.of(getMeasurement()))
                         .angularVelocity(RotationsPerSecond.of(getVelocity()));
                 },
                 this));
 
-    private final Mechanism2d mech2d = new Mechanism2d(20, 50);
-    private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Arm Root", 10, 0);
+    private final Mechanism2d mech2d = new Mechanism2d(ArmConstants.mechWidth, ArmConstants.mechHeight);
+    private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Arm Root", ArmConstants.mechWidth/2, ArmConstants.mechHeight/2);
     private final MechanismLigament2d armMech2d = mech2dRoot.append(new MechanismLigament2d("Arm", 20, 90));
     
     private TalonFXSimState armMotorSim = armMotor.getSimState();
         
     public Arm() {
-        motorOutput = new MotorOutputConfigs();
-        armPID = new PIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kP);
-        feedFor = new ArmFeedforward(ArmConstants.ks, ArmConstants.kg, ArmConstants.kv);
+        var currentConfigs = new MotorOutputConfigs();
+        currentConfigs.NeutralMode = NeutralModeValue.Coast;
+        armMotor.getConfigurator().apply(currentConfigs);
 
-        armPID.setTolerance(ArmConstants.tolerance);
-        Shuffleboard.getTab("Arm Controller").add(armPID);
-    }
-
-    public void setArmUp() {
-        motorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        armMotor.getConfigurator().apply(motorOutput);
-    }
-
-    public void setArmDown() {
-        motorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        armMotor.getConfigurator().apply(motorOutput);
+        armController.setTolerance(ArmConstants.tolerance);
+        SmartDashboard.putData("Arm Controller",armController);
     }
 
     public void setSpeed(double speed) {
         armMotor.set(speed);
     }
     
-    public double getPose() {
-        return ((armMotor.getPosition().getValueAsDouble()+ArmConstants.armOffset)/ArmConstants.gearRatio);
+    public double getMeasurement() {
+        return armMotor.getPosition().getValueAsDouble()/ArmConstants.gearRatio-ArmConstants.armOffset;
     }
     
     public void setGoal(double newGoal){
@@ -100,26 +90,19 @@ public class Arm extends SubsystemBase{
         return armMotor.getVelocity().getValueAsDouble()/ArmConstants.gearRatio;
     }
 
-    public void moveToLevel(double goal) {
-        armPID.calculate(goal);
-    } 
-
     public void telemetry() {
-        SmartDashboard.putNumber("Arm pose", armSim.getAngleRads());
+        SmartDashboard.putNumber("Arm Angle", armSim.getAngleRads());
         SmartDashboard.putNumber("Arm Velocity", armSim.getVelocityRadPerSec());
-        SmartDashboard.putNumber("Arm Speed", armMotor.get());
-        armMech2d.setAngle(getPose()*360);
+        SmartDashboard.putNumber("Arm Input", armMotor.get());
+        armMech2d.setAngle(getMeasurement()*360);
         SmartDashboard.putData("Arm", mech2d);
-        if (RobotBase.isSimulation()) {
-            armMotor.setPosition(armMotor.getPosition().getValueAsDouble() + armMotor.get()/50);
-        }
     }
 
     @Override
     public void periodic(){
         telemetry();
-        double extra = feedFor.calculate(goal, 0);
-        double voltage = armPID.calculate(getPose(), goal)+extra;
+        double extra = feedforward.calculate(getMeasurement(), getVelocity());
+        double voltage = armController.calculate(getMeasurement(), goal)+extra;
         setVoltage(Volts.of(voltage));
     }
 
@@ -128,11 +111,11 @@ public class Arm extends SubsystemBase{
         armMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
         double armInput = armMotorSim.getMotorVoltage();
         armSim.setInputVoltage(armInput);
-        armSim.update(0.02);
-        double angle = armSim.getAngleRads()/(Math.PI*2);
-        armMotorSim.setRotorVelocity(armSim.getVelocityRadPerSec()/(Math.PI*2)*ArmConstants.gearRatio);
-        armMotorSim.setRawRotorPosition((angle*ArmConstants.gearRatio)-ArmConstants.armOffset);
+        armSim.update(ArmConstants.simPeriod);
+        double angle = armSim.getAngleRads()/(2*Math.PI);
+        double vel = armSim.getVelocityRadPerSec()/(2*Math.PI);
+        armMotorSim.setRotorVelocity(vel*ArmConstants.gearRatio);
+        armMotorSim.setRawRotorPosition((angle+ArmConstants.armOffset)*ArmConstants.gearRatio);
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
-
     }
 }

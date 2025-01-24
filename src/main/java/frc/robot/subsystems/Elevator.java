@@ -38,7 +38,7 @@ public class Elevator extends SubsystemBase {
     private ElevatorFeedforward feedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
 
     // Simulation objects for the elevator
-    private ElevatorSim elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2), ElevatorConstants.elevatorGearing, ElevatorConstants.carriageMass, ElevatorConstants.drumRadius, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, ElevatorConstants.startingHeight);
+    private ElevatorSim elevatorSim = new ElevatorSim(ElevatorConstants.motorSim, ElevatorConstants.gearRatio, ElevatorConstants.carriageMass, ElevatorConstants.drumRadius, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, ElevatorConstants.startingHeight);
     private TalonFXSimState leftMotorSim = leftMotor.getSimState();
     private TalonFXSimState rightMotorSim = rightMotor.getSimState();
 
