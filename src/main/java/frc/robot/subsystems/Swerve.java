@@ -243,7 +243,7 @@ public class Swerve extends SubsystemBase {
                 }
                 int x = vision.checkObjectOnReef(target3d);
                 if (x%5 > 0) {
-                    Reef.registerCoralPlaced(x/5, x%5);
+                    Reef.setCoralPlaced(x/5, x%5, true);
                 }
             });
         }

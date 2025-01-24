@@ -50,6 +50,7 @@ public class RobotContainer {
 	private Supplier<Command> sourceIntake;
 
 	private Reef reef;
+	private ReefScoring reefScoring;
 
 	private AutoFactory autoFactory;
 
@@ -74,7 +75,9 @@ public class RobotContainer {
     	hangCommand = new HangCommand(hang);
 
 		reef = new Reef();
+		reefScoring = new ReefScoring();
 		SmartDashboard.putData("Reef", reef);
+		SmartDashboard.putData("ReefScoring", reefScoring);
 
 		configureCommands();
 		configureBindings();
