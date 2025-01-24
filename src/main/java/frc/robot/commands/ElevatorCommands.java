@@ -23,24 +23,23 @@ public class ElevatorCommands {
     }
 
     public Command moveToL1(){
-        System.out.println("x");
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L1goal),elevator);
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal1),elevator);
     }
     
     public Command moveToL2(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L2goal),elevator);
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal2),elevator);
     }
 
     public Command moveToL3(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L3goal),elevator);
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal3),elevator);
     }
 
     public Command moveToL4(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L4goal),elevator);
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal4),elevator);
     }
 
-    public Command moveToIntake(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.intakeGoal),elevator);
+    public Command moveToSource(){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.sourceGoal),elevator);
     }
 
     public Command moveToGroundIntake(){
@@ -48,7 +47,7 @@ public class ElevatorCommands {
     }
 
     public Command moveToDefault(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.defaultPosition),elevator);
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.defaultGoal),elevator);
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction dir){

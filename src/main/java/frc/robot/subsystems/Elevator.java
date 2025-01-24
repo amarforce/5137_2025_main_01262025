@@ -35,7 +35,7 @@ public class Elevator extends SubsystemBase {
 
     // PID controller and feedforward controller for elevator control
     private PIDController controller = new PIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
-    private ElevatorFeedforward feedforward = new ElevatorFeedforward(ElevatorConstants.ks, ElevatorConstants.kg, ElevatorConstants.kv);
+    private ElevatorFeedforward feedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
 
     // Simulation objects for the elevator
     private ElevatorSim elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2), ElevatorConstants.elevatorGearing, ElevatorConstants.carriageMass, ElevatorConstants.drumRadius, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, ElevatorConstants.startingHeight);
@@ -43,7 +43,7 @@ public class Elevator extends SubsystemBase {
     private TalonFXSimState rightMotorSim = rightMotor.getSimState();
 
     // Goal position for the elevator
-    private double goal = ElevatorConstants.defaultPosition;
+    private double goal = ElevatorConstants.defaultGoal;
 
     // SysId routine for system identification
     public final SysIdRoutine sysIdRoutine = 
