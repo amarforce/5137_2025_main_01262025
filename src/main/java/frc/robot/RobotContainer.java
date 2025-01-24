@@ -40,6 +40,7 @@ public class RobotContainer {
 	private IntakeCommands intakeCommands;
   	private HangCommand hangCommand;
 
+	private Supplier<Command> score;
 	private Supplier<Command> scoreL4;
 	private Supplier<Command> scoreL3;
 	private Supplier<Command> scoreL2;
@@ -82,12 +83,24 @@ public class RobotContainer {
 	}
 
 	private void configureCommands() { //TODO: Configure these to retract elevator/arm, add wrist/intake commands, and add pickup methods
+		score = () -> 
+		new SequentialCommandGroup (
+			intakeCommands.intakeReverse(),
+			new WaitCommand(0.1),
+			new ParallelCommandGroup(
+				elevatorCommands.moveToDefault(),
+				armCommands.moveToL1()
+			)
+		);
+
 		scoreL4 = () ->
 		new SequentialCommandGroup (
 			new ParallelCommandGroup(
 				elevatorCommands.moveToL4(),
 				armCommands.moveToL4()
-			)
+			),
+			new WaitCommand(0.4),
+			score.get()
 		);
 
 		scoreL3 = () -> 
@@ -95,7 +108,9 @@ public class RobotContainer {
 			new ParallelCommandGroup(
 				elevatorCommands.moveToL3(),
 				armCommands.moveToL3()
-			)
+			),
+			new WaitCommand(0.3),
+			score.get()
 		);
 
 		scoreL2 = () -> 
@@ -103,7 +118,9 @@ public class RobotContainer {
 			new ParallelCommandGroup(
 				elevatorCommands.moveToL2(),
 				armCommands.moveToL2()
-			)
+			),
+			new WaitCommand(0.2),
+			score.get()
 		);
 
 		scoreL1 = () -> 
@@ -111,7 +128,9 @@ public class RobotContainer {
 			new ParallelCommandGroup(
 				elevatorCommands.moveToL1(),
 				armCommands.moveToL1()
-			)
+			),
+			new WaitCommand(0.1),
+			score.get()
 		);
 
 		removeAlgae = () ->
