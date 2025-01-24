@@ -47,6 +47,10 @@ public class ElevatorCommands {
         return new InstantCommand(()->elevator.setGoal(ElevatorConstants.groundIntakeGoal),elevator);
     }
 
+    public Command moveToDefault(){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.defaultPosition),elevator);
+    }
+
     public Command sysIdQuasistatic(SysIdRoutine.Direction dir){
         return elevator.sysIdRoutine.quasistatic(dir);
     }
