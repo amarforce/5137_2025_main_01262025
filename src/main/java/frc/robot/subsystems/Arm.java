@@ -37,7 +37,7 @@ public class Arm extends SubsystemBase{
     private ArmFeedforward feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV);
     private double goal = ArmConstants.defaultGoal;
     
-    private SingleJointedArmSim armSim = new SingleJointedArmSim(ArmConstants.motorSim, ArmConstants.gearRatio, ArmConstants.jkg, ArmConstants.armLength, ArmConstants.minAngle, ArmConstants.maxAngle, true, ArmConstants.defaultGoal);
+    private SingleJointedArmSim armSim = new SingleJointedArmSim(ArmConstants.motorSim, ArmConstants.gearRatio, ArmConstants.momentOfInertia, ArmConstants.armLength, ArmConstants.minAngle, ArmConstants.maxAngle, true, ArmConstants.defaultGoal);
 
     public final SysIdRoutine sysIdRoutine =
         new SysIdRoutine(
@@ -51,10 +51,6 @@ public class Arm extends SubsystemBase{
                         .angularVelocity(RadiansPerSecond.of(getVelocity()));
                 },
                 this));
-
-    private final Mechanism2d mech2d = new Mechanism2d(ArmConstants.mechWidth, ArmConstants.mechHeight);
-    private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Arm Root", ArmConstants.mechWidth/2, ArmConstants.mechHeight/2);
-    private final MechanismLigament2d armMech2d = mech2dRoot.append(new MechanismLigament2d("Arm", 20, 90));
     
     private TalonFXSimState armMotorSim = armMotor.getSimState();
         
@@ -77,6 +73,12 @@ public class Arm extends SubsystemBase{
     }
     
     public void setGoal(double newGoal){
+        if(newGoal<ArmConstants.minAngle){
+            newGoal=ArmConstants.minAngle;
+        }
+        if(newGoal>ArmConstants.maxAngle){
+            newGoal=ArmConstants.maxAngle;
+        }
         goal = newGoal;
     }
 
@@ -97,8 +99,6 @@ public class Arm extends SubsystemBase{
         SmartDashboard.putNumber("Arm Angle", armSim.getAngleRads());
         SmartDashboard.putNumber("Arm Velocity", armSim.getVelocityRadPerSec());
         SmartDashboard.putNumber("Arm Input", armMotor.get());
-        armMech2d.setAngle(Units.radiansToDegrees(getMeasurement()));
-        SmartDashboard.putData("Arm", mech2d);
     }
 
     @Override

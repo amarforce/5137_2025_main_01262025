@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.elastic.*;
+import frc.robot.other.ArmMechanism;
 import frc.robot.other.AutoFactory;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
@@ -32,6 +33,7 @@ public class RobotContainer {
 	private Wrist wrist;
 	private Intake intake;
   	private Hang hang;
+	private ArmMechanism armMechanism;
 
 	private SwerveCommands swerveCommands;
 	private ElevatorCommands elevatorCommands;
@@ -66,6 +68,7 @@ public class RobotContainer {
 		wrist = new Wrist();
 		intake = new Intake();
     	hang = new Hang();
+		armMechanism = new ArmMechanism(arm, elevator);
 
 		swerveCommands = new SwerveCommands(swerve);
 		elevatorCommands = new ElevatorCommands(elevator);
@@ -198,9 +201,9 @@ public class RobotContainer {
 
 		// Operator Bindings
 
-		//elevator.setDefaultCommand(elevatorCommands.setGoal(()->1-operator.getLeftY()));
+		elevator.setDefaultCommand(elevatorCommands.changeGoal(()->-operator.getLeftY()/50));
 
-		//arm.setDefaultCommand(armCommands.setSpeed(() -> operator.getRightX()));
+		arm.setDefaultCommand(armCommands.changeGoal(() ->-operator.getLeftX()/50));
 
 		operator.triangle()
 			.onTrue(scoreL4.get());

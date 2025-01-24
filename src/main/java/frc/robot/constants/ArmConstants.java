@@ -29,12 +29,12 @@ public class ArmConstants {
     public static final double goal2 = Units.degreesToRadians(25); // enter level 2 goal
     public static final double goal3 = Units.degreesToRadians(50); // enter level 3 goal
     public static final double goal4 = Units.degreesToRadians(75); // enter high goal
-    public static final double defaultGoal = Units.degreesToRadians(90); // enter high goal
+    public static final double defaultGoal = Units.degreesToRadians(90);
     
     // Simulation constants
     public static final double minAngle = Units.degreesToRadians(-43);
     public static final double maxAngle = Units.degreesToRadians(180);
-    public static final double jkg = 1.2;
+    public static final double momentOfInertia = 1.2;
     public static final double armLength = 0.594;
     public static final DCMotor motorSim = DCMotor.getKrakenX60(1);
     public static final double simPeriod = 0.02;
