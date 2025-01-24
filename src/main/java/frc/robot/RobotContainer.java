@@ -34,6 +34,7 @@ public class RobotContainer {
 	private IntakeCommands intakeCommands;
 
 	private Reef reef;
+	private ReefScoring reefScoring;
 
 	public RobotContainer() {
 		driver = new CommandPS5Controller(0);
@@ -53,7 +54,9 @@ public class RobotContainer {
 		intakeCommands = new IntakeCommands(intake);
 
 		reef = new Reef();
+		reefScoring = new ReefScoring(reef);
 		SmartDashboard.putData("Reef", reef);
+		SmartDashboard.putData("ReefScoring", reefScoring);
 
 		configureBindings();
 	}
