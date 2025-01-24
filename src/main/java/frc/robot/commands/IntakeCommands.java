@@ -17,6 +17,7 @@ public class IntakeCommands {
     public InstantCommand intakeForward(){
         return new InstantCommand(() -> intake.setSpeed(IntakeConstants.defaultMotorSpeedIntake), intake);
     }
+
     public InstantCommand intakeReverse(){
         return new InstantCommand(() -> intake.setSpeed(-IntakeConstants.defaultMotorSpeedIntake), intake);
     }

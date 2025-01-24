@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -10,6 +9,7 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -34,7 +34,6 @@ public class Arm extends SubsystemBase{
     private MotorOutputConfigs motorOutput;
     private PIDController armPID;
     private double goal = 0;
-    private final DutyCycleOut request = new DutyCycleOut(0.0);
     private ArmFeedforward feedFor;
     
     private SingleJointedArmSim armSim = new SingleJointedArmSim(DCMotor.getKrakenX60(1), ArmConstants.gearRatio, ArmConstants.jkg, ArmConstants.armLength, ArmConstants.min, ArmConstants.max, true, ArmConstants.min);
@@ -45,7 +44,7 @@ public class Arm extends SubsystemBase{
             new SysIdRoutine.Mechanism(
                 this::setVoltage,
                 log -> {
-                    log.motor("arm") 
+                    log.motor("arm")
                         .voltage(Volts.of(armMotor.get() * RobotController.getBatteryVoltage()))
                         .angularPosition(Rotations.of(getPose()))
                         .angularVelocity(RotationsPerSecond.of(getVelocity()));
@@ -78,7 +77,7 @@ public class Arm extends SubsystemBase{
     }
 
     public void setSpeed(double speed) {
-        armMotor.setControl(request.withOutput(speed));
+        armMotor.set(speed);
     }
     
     public double getPose() {
@@ -111,6 +110,9 @@ public class Arm extends SubsystemBase{
         SmartDashboard.putNumber("Arm Speed", armMotor.get());
         armMech2d.setAngle(getPose()*360);
         SmartDashboard.putData("Arm", mech2d);
+        if (RobotBase.isSimulation()) {
+            armMotor.setPosition(armMotor.getPosition().getValueAsDouble() + armMotor.get()/50);
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -9,12 +10,16 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.constants.VisionConstants;
@@ -86,9 +91,51 @@ public class Vision extends SubsystemBase {
         return leftPoseEstimator.update(leftCamera.getLatestResult());
     }
 
-    public PhotonTrackedTarget getClosestCoral() {
-        return frontObjectCamera.getLatestResult().getBestTarget();
+    public List<PhotonTrackedTarget> getObjects() {
+        List<PhotonPipelineResult> result = frontObjectCamera.getAllUnreadResults();
+        if (!result.isEmpty() && result.get(0).hasTargets()) {
+            return result.get(0).getTargets();
+        }
+        return null;
     }
+
+    public Translation3d getTarget3d(PhotonTrackedTarget target, Transform3d robotToCamera, Pose2d robotPose) {
+        Translation3d robotToTarget = target.getBestCameraToTarget().getTranslation().plus(robotToCamera.getTranslation());
+        Translation2d robotToTarget2d = robotToTarget.toTranslation2d();
+        return new Translation3d(robotToTarget2d.getX() + robotPose.getX(), robotToTarget2d.getY() + robotPose.getY(), robotToCamera.getZ());
+    }
+
+    public int checkObjectOnReef(Translation3d target3d) {
+        int closest = 0;
+        double closest_distance = 100.0;
+        Translation2d[] reefPositions = VisionConstants.reefPositions;
+        for (int i = 0; i < reefPositions.length; i++) {
+            Translation2d diff = target3d.toTranslation2d().minus(reefPositions[i]);
+            double distance = Math.hypot(diff.getX(), diff.getY());
+            if (distance < closest_distance) {
+                closest_distance = distance;
+                closest = i;
+            }
+        }
+        Translation2d closestReef = reefPositions[closest];
+        Translation2d diff = target3d.toTranslation2d().minus(closestReef);
+        if (Math.abs(diff.getX()) <= VisionConstants.objectMarginOfError && Math.abs(diff.getY()) <= VisionConstants.objectMarginOfError) {
+            double height = target3d.getZ();
+            if (Math.abs(height - VisionConstants.L4) < VisionConstants.objectMarginOfError) {
+                return 4 + closest*5;
+            } else if (Math.abs(height - VisionConstants.L3) < VisionConstants.objectMarginOfError) {
+                return 3 + closest*5;
+            } else if (Math.abs(height - VisionConstants.L2) < VisionConstants.objectMarginOfError) {
+                return 2 + closest*5;
+            } else if (Math.abs(height - VisionConstants.L1) < VisionConstants.objectMarginOfError) {
+                return 1 + closest*5;
+            } else {
+                return 0 + closest*5;
+            }
+        } else {
+            return 0;
+        }
+    };
 
     public void updateSim(Pose2d pose) {
         visionSim.update(pose);

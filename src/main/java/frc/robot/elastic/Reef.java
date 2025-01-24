@@ -4,12 +4,10 @@ import org.json.simple.JSONObject;
 
 import edu.wpi.first.networktables.NTSendable;
 import edu.wpi.first.networktables.NTSendableBuilder;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class Reef implements NTSendable{
-    private boolean[][] coralPlaced;
-    private boolean[] algaePlaced;
+    private static boolean[][] coralPlaced;
+    private static boolean[] algaePlaced;
     public Reef(){
         coralPlaced=new boolean[3][12];
         algaePlaced=new boolean[6];
@@ -17,19 +15,19 @@ public class Reef implements NTSendable{
             algaePlaced[i]=true;
         }
     }
-    public boolean isCoralPlaced(int level,int branch){
+    public static boolean isCoralPlaced(int level,int branch){
         return coralPlaced[level-2][branch];
     }
-    public void setCoralPlaced(int level,int branch,boolean set){
+    public static void setCoralPlaced(int level,int branch,boolean set){
         coralPlaced[level-2][branch]=set;
     }
-    public boolean isAlgaePlaced(int side){
+    public static boolean isAlgaePlaced(int side){
         return algaePlaced[side];
     }
-    public void setAlgaePlaced(int side,boolean set){
+    public static void setAlgaePlaced(int side,boolean set){
         algaePlaced[side]=set;
     }
-    public boolean isCoralBlocked(int level,int branch){
+    public static boolean isCoralBlocked(int level,int branch){
         int side=branch/2;
         if(algaePlaced[side]){
             int lowAlgae=side%2;
@@ -42,7 +40,8 @@ public class Reef implements NTSendable{
             return false;
         }
     }
-    public String jsonify(){
+    @SuppressWarnings("unchecked")
+    public static String jsonify(){
         JSONObject obj = new JSONObject();
         for (int i=0; i<coralPlaced.length; i++){
             for (int j=0; j<coralPlaced[i].length; j++){

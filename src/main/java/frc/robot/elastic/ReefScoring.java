@@ -6,19 +6,19 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class ReefScoring implements Sendable{
-    private Reef reef;
-    public ReefScoring(Reef reef){
-        this.reef=reef;
+    public ReefScoring(){
+        
     }
     public int getCount(int level){
         int count=0;
         for(int j=0; j<12; j++){
-            if(reef.isCoralPlaced(level,j)){
+            if(Reef.isCoralPlaced(level,j)){
                 count++;
             }
         }
         return count;
     }
+    @SuppressWarnings("unchecked")
     public String jsonify(){
         JSONObject obj = new JSONObject();
         // TODO add L1 scoring

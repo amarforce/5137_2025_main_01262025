@@ -1,16 +1,20 @@
 package frc.robot.subsystems;
 
 import frc.robot.constants.SwerveConstants;
+import frc.robot.constants.VisionConstants;
+import frc.robot.elastic.Reef;
 import frc.robot.other.SwerveFactory;
 import frc.robot.other.Telemetry;
 
 import static edu.wpi.first.units.Units.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -22,13 +26,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -157,12 +161,7 @@ public class Swerve extends SubsystemBase {
         if (onRedAlliance()) {
             pose = invertPose(pose);
         }
-        Command path = AutoBuilder.pathfindToPose(pose, new PathConstraints(
-            MetersPerSecond.of(5.0),
-            MetersPerSecondPerSecond.of(5.0),
-            RadiansPerSecond.of(1.5*Math.PI),
-            RadiansPerSecondPerSecond.of(Math.PI)),
-            MetersPerSecond.of(0.0));
+        Command path = AutoBuilder.pathfindToPose(pose, SwerveConstants.constaints);
         path.addRequirements(this);
         path.schedule();
     }
@@ -216,10 +215,13 @@ public class Swerve extends SubsystemBase {
         this.setControl(lock);
     }
 
+    // Reef Visualization using Object Detection
+
     @Override
     public void periodic() {
         Optional<EstimatedRobotPose> frontPose = vision.getFrontPoseEstimate();
         Optional<EstimatedRobotPose> leftPose = vision.getFrontPoseEstimate();
+        List<PhotonTrackedTarget> objects = vision.getObjects();
 
         if (frontPose.isPresent()) {
             swerve.addVisionMeasurement(
@@ -231,6 +233,19 @@ public class Swerve extends SubsystemBase {
             swerve.addVisionMeasurement(
             leftPose.get().estimatedPose.toPose2d(),
             leftPose.get().timestampSeconds);
+        }
+
+        if (objects != null) {
+            objects.forEach((PhotonTrackedTarget target) -> {
+                Translation3d target3d = vision.getTarget3d(target, VisionConstants.robotToFrontObjectCamera, getPose());
+                if (onRedAlliance()) {
+                    target3d = new Translation3d(SwerveConstants.fieldLength - target3d.getX(), SwerveConstants.fieldWidth - target3d.getY(), target3d.getZ());
+                }
+                int x = vision.checkObjectOnReef(target3d);
+                if (x%5 > 0) {
+                    Reef.setCoralPlaced(x/5, x%5, true);
+                }
+            });
         }
 
         field.setRobotPose(this.getPose());
