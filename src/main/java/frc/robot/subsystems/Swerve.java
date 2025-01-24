@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import frc.robot.Robot;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.elastic.Reef;
@@ -37,7 +38,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -109,7 +109,7 @@ public class Swerve extends SubsystemBase {
         cageChoice.setDefaultOption("Center", 1);
         SmartDashboard.putData("Cage Choice", cageChoice);
         
-        if (RobotBase.isSimulation()) {
+        if (Robot.isSimulation()) {
             startSimThread();
         }
 
@@ -208,6 +208,9 @@ public class Swerve extends SubsystemBase {
                     : Rotation2d.kZero
             );
         });
+        if (Robot.isSimulation()) {
+            swerve.setOperatorPerspectiveForward(Rotation2d.kCCW_90deg);
+        }
         swerve.seedFieldCentric();
     }
 
