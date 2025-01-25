@@ -86,8 +86,9 @@ public class AutoStep {
 
     public Command getCommand() {
         return new SequentialCommandGroup(
-            multiCommands.getCoral(pickupChooser.getSelected()),
-            new ParallelCommandGroup(multiCommands.moveToGoal(levelChooser.getSelected()),multiCommands.getSwerveCommands().driveToPose(reefChooser.getSelected())));
+            multiCommands.getCoral(RobotUtils.invertPoseToAlliance(pickupChooser.getSelected())),
+            new ParallelCommandGroup(multiCommands.moveToGoal(levelChooser.getSelected()),
+            multiCommands.getSwerveCommands().driveToPose(reefChooser.getSelected())));
     }
 
     public Pose2d getPose() {

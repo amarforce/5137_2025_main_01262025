@@ -30,7 +30,7 @@ public class AutoFactory {
         SmartDashboard.putData("Auto Builder", build);
 
         for(int i=0;i<GeneralConstants.numAuto;i++){
-            choices[i]=new AutoStep(i, multiCommands);
+            choices[i]=new AutoStep(i+1, multiCommands);
         }
 
         build.onChange((Boolean build) -> {
