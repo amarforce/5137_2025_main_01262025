@@ -48,7 +48,6 @@ public class RobotContainer {
 
 	private AutoFactory autoFactory;
 
-	@SuppressWarnings("unchecked")
 	public RobotContainer() {
 		driver = new CommandPS5Controller(0);
 		operator = new CommandPS5Controller(1);
