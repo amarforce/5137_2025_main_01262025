@@ -8,7 +8,7 @@ public class MechanismConstants {
     // Realistic arm length
     public static final double armLength = (ArmConstants.armLength/ElevatorConstants.maxHeight)*mechHeight/2;
     // Realistic wrist length
-    public static final double wristLength = (WristConstants.wristLength/ElevatorConstants.maxHeight)*mechHeight/2;
+    public static final double wristLength = ((WristConstants.wristLength/ElevatorConstants.maxHeight)*mechHeight/2)*1.5; // wrist was too short
 
     // Mechanism colors
     public static final Color8Bit elevatorColor = new Color8Bit(0,0,255);

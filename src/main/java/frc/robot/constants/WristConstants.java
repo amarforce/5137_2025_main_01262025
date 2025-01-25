@@ -21,8 +21,8 @@ public class WristConstants {
     public static final double wristTolerance = 0.1;
 
     // Positions
-    public static final double pos1 = Units.degreesToRadians(0);
-    public static final double pos2 = Units.degreesToRadians(90);
+    public static final double pos1 = Units.degreesToRadians(0); // down
+    public static final double pos2 = Units.degreesToRadians(90); // straight
 
     // Simulation constants
     public static final double momentOfInertia = 0.0155;

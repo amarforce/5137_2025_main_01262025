@@ -43,23 +43,23 @@ public class MultiCommands {
     }
 
     public Command moveToGroundIntake(){
-        return new ParallelCommandGroup(armCommands.moveToGroundIntake(),elevatorCommands.moveToGroundIntake());
+        return new ParallelCommandGroup(armCommands.moveToGroundIntake(),elevatorCommands.moveToGroundIntake(),wristCommands.toPos1());
     }
 
     public Command moveToDefault(){
-        return new ParallelCommandGroup(armCommands.moveToDefault(),elevatorCommands.moveToDefault());
+        return new ParallelCommandGroup(armCommands.moveToDefault(),elevatorCommands.moveToDefault(),wristCommands.toPos1());
     }
 
     public Command moveToSource(){
-        return new ParallelCommandGroup(armCommands.moveToSource(),elevatorCommands.moveToSource());
+        return new ParallelCommandGroup(armCommands.moveToSource(),elevatorCommands.moveToSource(),wristCommands.toPos2());
     }
 
     public Command moveToAlgae(){
-        return new ParallelCommandGroup(armCommands.moveToAlgae(),elevatorCommands.moveToAlgae());
+        return new ParallelCommandGroup(armCommands.moveToAlgae(),elevatorCommands.moveToAlgae(),wristCommands.toPos2());
     }
 
     public Command moveToGoal(int goal){
-        return new ParallelCommandGroup(armCommands.moveToGoal(goal),elevatorCommands.moveToGoal(goal));
+        return new ParallelCommandGroup(armCommands.moveToGoal(goal),elevatorCommands.moveToGoal(goal),wristCommands.toPos2());
     }
 
     public Command getCoral(Pose2d pose) {
