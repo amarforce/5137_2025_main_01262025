@@ -32,13 +32,22 @@ import static edu.wpi.first.units.Units.Volts;
 
 public class Arm extends SubsystemBase{
     
+    // Motor controller for the arm
     private TalonFX armMotor = new TalonFX(ArmConstants.motorId, "rhino");
+    
+    // PID controller for arm position control
     private PIDController armController = new PIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD);
+    
+    // Feedforward controller for arm dynamics
     private ArmFeedforward feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV);
+    
+    // Goal position for the arm in radians
     private double goal = ArmConstants.defaultGoal;
     
+    // Simulation model for the arm
     private SingleJointedArmSim armSim = new SingleJointedArmSim(ArmConstants.motorSim, ArmConstants.gearRatio, ArmConstants.momentOfInertia, ArmConstants.armLength, ArmConstants.minAngle, ArmConstants.maxAngle, true, ArmConstants.defaultGoal);
 
+    // System Identification routine for characterizing the arm
     public final SysIdRoutine sysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(),
@@ -52,26 +61,34 @@ public class Arm extends SubsystemBase{
                 },
                 this));
     
+    // Simulation state for the motor
     private TalonFXSimState armMotorSim = armMotor.getSimState();
         
+    // Constructor for the Arm subsystem
     public Arm() {
+        // Configure the motor to coast when neutral
         var currentConfigs = new MotorOutputConfigs();
         currentConfigs.NeutralMode = NeutralModeValue.Coast;
         armMotor.getConfigurator().apply(currentConfigs);
 
+        // Set the tolerance for the PID controller
         armController.setTolerance(ArmConstants.armTolerance);
+        
+        // Display the PID controller on SmartDashboard for tuning
         SmartDashboard.putData("Arm Controller",armController);
     }
 
+    // Set the speed of the arm motor
     public void setSpeed(double speed) {
         armMotor.set(speed);
     }
     
-    // Returns measurement in radians
+    // Get the current arm position in radians
     public double getMeasurement() {
         return Units.rotationsToRadians(armMotor.getPosition().getValueAsDouble()/ArmConstants.gearRatio)-ArmConstants.armOffset;
     }
     
+    // Set the goal position for the arm, clamping it within the allowed range
     public void setGoal(double newGoal){
         if(newGoal<ArmConstants.minAngle){
             newGoal=ArmConstants.minAngle;
@@ -82,43 +99,60 @@ public class Arm extends SubsystemBase{
         goal = newGoal;
     }
 
+    // Get the current goal position
     public double getGoal(){
         return goal;
     }
 
+    // Set the voltage applied to the arm motor
     public void setVoltage(Voltage v) {
         armMotor.setVoltage(v.magnitude());
     }
 
-    // Returns velocity in radians/sec
+    // Get the current arm velocity in radians per second
     public double getVelocity() {
         return Units.rotationsToRadians(armMotor.getVelocity().getValueAsDouble()/ArmConstants.gearRatio);
     }
 
+    // Display telemetry data on SmartDashboard
     public void telemetry() {
         SmartDashboard.putNumber("Arm Angle", armSim.getAngleRads());
         SmartDashboard.putNumber("Arm Velocity", armSim.getVelocityRadPerSec());
         SmartDashboard.putNumber("Arm Input", armMotor.get());
     }
 
+    // Periodic method called every loop iteration
     @Override
     public void periodic(){
+        // Update telemetry
         telemetry();
+        
+        // Calculate feedforward and PID control outputs
         double extra = feedforward.calculate(getMeasurement(), getVelocity());
         double voltage = armController.calculate(getMeasurement(), goal)+extra;
+        
+        // Apply the calculated voltage to the motor
         setVoltage(Volts.of(voltage));
     }
 
+    // Simulation periodic method called every loop iteration in simulation
     @Override
     public void simulationPeriodic() {
+        // Update the motor simulation state with the current battery voltage
         armMotorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+        
+        // Get the current motor input voltage and update the arm simulation
         double armInput = armMotorSim.getMotorVoltage();
         armSim.setInputVoltage(armInput);
         armSim.update(ArmConstants.simPeriod);
+        
+        // Update the motor simulation state with the new arm position and velocity
         double angle = armSim.getAngleRads();
         armMotorSim.setRawRotorPosition(Units.radiansToRotations((angle+ArmConstants.armOffset)*ArmConstants.gearRatio));
         double vel = armSim.getVelocityRadPerSec();
         armMotorSim.setRotorVelocity(Units.radiansToRotations(vel*ArmConstants.gearRatio));
+        
+        // Update the RoboRIO simulation state with the new battery voltage
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(armSim.getCurrentDrawAmps()));
     }
 }
