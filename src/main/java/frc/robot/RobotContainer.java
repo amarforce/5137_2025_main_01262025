@@ -41,15 +41,7 @@ public class RobotContainer {
 	private WristCommands wristCommands;
 	private IntakeCommands intakeCommands;
   	private HangCommand hangCommand;
-
-	private Supplier<Command> score;
-	private Supplier<Command> scoreL4;
-	private Supplier<Command> scoreL3;
-	private Supplier<Command> scoreL2;
-	private Supplier<Command> scoreL1;
-	private Supplier<Command> removeAlgae;
-	private Supplier<Command> groundIntake;
-	private Supplier<Command> sourceIntake;
+	private MultiCommands multiCommands;
 
 	private Reef reef;
 	private ReefScoring reefScoring;
@@ -81,87 +73,11 @@ public class RobotContainer {
 		wristCommands = new WristCommands(wrist);
 		intakeCommands = new IntakeCommands(intake);
     	hangCommand = new HangCommand(hang);
+		multiCommands = new MultiCommands(arm,elevator,wrist,swerve,intake,hang,armCommands,elevatorCommands,wristCommands,swerveCommands,intakeCommands,hangCommand);
 
-		configureCommands();
 		configureBindings();
 
-		autoFactory = new AutoFactory(scoreL4, scoreL3, scoreL2, scoreL1, removeAlgae, groundIntake, sourceIntake);
-	}
-
-	private void configureCommands() { //TODO: Configure these to retract elevator/arm, add wrist/intake commands, and add pickup methods
-		score = () -> 
-		new SequentialCommandGroup (
-			intakeCommands.intakeReverse(),
-			new WaitCommand(0.1),
-			new ParallelCommandGroup(
-				elevatorCommands.moveToDefault(),
-				armCommands.moveToL1()
-			)
-		);
-
-		scoreL4 = () ->
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL4(),
-				armCommands.moveToL4()
-			),
-			new WaitCommand(0.4),
-			score.get()
-		);
-
-		scoreL3 = () -> 
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL3(),
-				armCommands.moveToL3()
-			),
-			new WaitCommand(0.3),
-			score.get()
-		);
-
-		scoreL2 = () -> 
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL2(),
-				armCommands.moveToL2()
-			),
-			new WaitCommand(0.2),
-			score.get()
-		);
-
-		scoreL1 = () -> 
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL1(),
-				armCommands.moveToL1()
-			),
-			new WaitCommand(0.1),
-			score.get()
-		);
-
-		removeAlgae = () ->
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL3(), //TODO: Make algae positions
-				armCommands.moveToL3()
-			)
-		);
-
-		groundIntake = () ->
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL1(),
-				armCommands.moveToL1()
-			)
-		);
-
-		sourceIntake = () ->
-		new SequentialCommandGroup (
-			new ParallelCommandGroup(
-				elevatorCommands.moveToL3(),
-				armCommands.moveToL3()
-			)
-		);
+		autoFactory = new AutoFactory();
 	}
 
 	private void configureBindings() {
@@ -197,25 +113,27 @@ public class RobotContainer {
 		driver.create().and(driver.povDown()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
 		*/
 
+		// Cancel all commands
 		driver.touchpad().onTrue(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
 
-		// Operator Bindings
-
+		// For testing
 		elevator.setDefaultCommand(elevatorCommands.changeGoal(()->-operator.getLeftY()/50));
 
 		arm.setDefaultCommand(armCommands.changeGoal(() ->-operator.getLeftX()/50));
 
+		// Operator Bindings
+
 		operator.triangle()
-			.onTrue(scoreL4.get());
+			.onTrue(multiCommands.moveToGoal(4));
 
 		operator.circle()
-			.onTrue(scoreL3.get());
+			.onTrue(multiCommands.moveToGoal(3));
 
 		operator.square()
-			.onTrue(scoreL2.get());
+			.onTrue(multiCommands.moveToGoal(2));
 
 		operator.cross()
-			.onTrue(scoreL1.get());
+			.onTrue(multiCommands.moveToGoal(1));
 
 		operator.R1()
 			.onTrue(wristCommands.wristForward())
@@ -231,10 +149,6 @@ public class RobotContainer {
     
 		operator.touchpad()
 		.onTrue(hangCommand);
-	}
-
-	public Reef getReef() {
-		return reef;
 	}
 
 	public Command getAutonomousCommand() {

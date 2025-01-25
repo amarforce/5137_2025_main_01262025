@@ -13,14 +13,13 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.SwerveConstants;
-import frc.robot.elastic.AutoChoice;
 
 public class AutoFactory {
-    private AutoChoice choiceOne;
-    private AutoChoice choiceTwo;
-    private AutoChoice choiceThree;
-    private AutoChoice choiceFour;
-    private AutoChoice choiceFive;
+    private AutoStep choiceOne;
+    private AutoStep choiceTwo;
+    private AutoStep choiceThree;
+    private AutoStep choiceFour;
+    private AutoStep choiceFive;
     private Supplier<Command> groundIntake;
     private Supplier<Command> sourceIntake;
     
@@ -29,11 +28,11 @@ public class AutoFactory {
 
     @SuppressWarnings("unchecked")
     public AutoFactory(Supplier<Command>... commands) {
-        choiceOne = new AutoChoice(1, commands);
-        choiceTwo = new AutoChoice(2, commands);
-        choiceThree = new AutoChoice(3, commands);
-        choiceFour = new AutoChoice(4, commands);
-        choiceFive = new AutoChoice(5, commands);
+        choiceOne = new AutoStep(1, commands);
+        choiceTwo = new AutoStep(2, commands);
+        choiceThree = new AutoStep(3, commands);
+        choiceFour = new AutoStep(4, commands);
+        choiceFive = new AutoStep(5, commands);
         groundIntake = commands[5];
         sourceIntake = commands[6];
 

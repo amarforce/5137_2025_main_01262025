@@ -1,4 +1,4 @@
-package frc.robot.elastic;
+package frc.robot.other;
 
 import java.util.function.Supplier;
 
@@ -8,35 +8,41 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.commands.ArmElevatorCommands;
+import frc.robot.commands.MultiCommands;
+import frc.robot.constants.GeneralConstants;
 import frc.robot.constants.SwerveConstants;
-import frc.robot.other.RobotUtils;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Swerve;
 
 /**
  * Creates three {@link SendableChooser}s for level select, reef position, and pickup position.
  */
-public class AutoChoice {
+public class AutoStep {
 
     private int id;
 
-    private SendableChooser<Supplier<Command>> levelChooser;
+    private SendableChooser<Integer> levelChooser;
     private SendableChooser<Pose2d> reefChooser;
     private SendableChooser<Pose2d> pickupChooser;
 
-    public AutoChoice(int id, Supplier<Command>[] commands) {
+    public AutoStep(int id, Supplier<Command>[] commands) {
         this.id = id;
 
-        levelChooser = new SendableChooser<Supplier<Command>>();
-        levelChooser.setDefaultOption("L4", commands[0]);
-        levelChooser.addOption("L3", commands[1]);
-        levelChooser.addOption("L2", commands[2]);
-        levelChooser.addOption("L1", commands[3]);
-        levelChooser.addOption("Algae", commands[4]);
+        levelChooser = new SendableChooser<Integer>();
+        levelChooser.setDefaultOption("L4", 4);
+        levelChooser.addOption("L3", 3);
+        levelChooser.addOption("L2", 2);
+        levelChooser.addOption("L1", 1);
+        levelChooser.addOption("Algae", 0);
         SmartDashboard.putData("Level Choice " + id, levelChooser);
 
         switchToCoralPoses();
 
-        levelChooser.onChange((Supplier<Command> choice) -> {
-            if (choice.equals(commands[4])) {
+        levelChooser.onChange((Integer choice) -> {
+            if (choice.equals(0)) {
                 switchToAlgaePoses();
             } else {
                 switchToCoralPoses();
@@ -46,18 +52,10 @@ public class AutoChoice {
 
     private void switchToCoralPoses() {
         reefChooser = new SendableChooser<Pose2d>();
-        reefChooser.setDefaultOption("A", SwerveConstants.reefA);
-        reefChooser.addOption("B", SwerveConstants.reefB);
-        reefChooser.addOption("C", SwerveConstants.reefC);
-        reefChooser.addOption("D", SwerveConstants.reefD);
-        reefChooser.addOption("E", SwerveConstants.reefE);
-        reefChooser.addOption("F", SwerveConstants.reefF);
-        reefChooser.addOption("G", SwerveConstants.reefG);
-        reefChooser.addOption("H", SwerveConstants.reefH);
-        reefChooser.addOption("I", SwerveConstants.reefI);
-        reefChooser.addOption("J", SwerveConstants.reefJ);
-        reefChooser.addOption("K", SwerveConstants.reefK);
-        reefChooser.addOption("L", SwerveConstants.reefL);
+        reefChooser.setDefaultOption("A", SwerveConstants.allReef[0]);
+        for(int i=1;i<GeneralConstants.sides*2;i++){
+            reefChooser.addOption(Character.toString('A'+i), SwerveConstants.allReef[i]);
+        }
         SmartDashboard.putData("Reef Choice " + id, reefChooser);
 
         pickupChooser = new SendableChooser<Pose2d>();
@@ -73,20 +71,25 @@ public class AutoChoice {
 
     private void switchToAlgaePoses() {
         reefChooser = new SendableChooser<Pose2d>();
-        reefChooser.setDefaultOption("AB", SwerveConstants.reefAB);
-        reefChooser.addOption("CD", SwerveConstants.reefCD);
-        reefChooser.addOption("EF", SwerveConstants.reefEF);
-        reefChooser.addOption("GH", SwerveConstants.reefGH);
-        reefChooser.addOption("IJ", SwerveConstants.reefIJ);
-        reefChooser.addOption("KL", SwerveConstants.reefKL);
+        reefChooser.setDefaultOption("AB", SwerveConstants.centerReef[0]);
+        for(int i=1;i<GeneralConstants.sides;i++){
+            reefChooser.addOption(Character.toString('A'+(2*i))+Character.toString('A'+(2*i+1)), SwerveConstants.centerReef[i]);
+        }
         SmartDashboard.putData("Reef Choice " + id, reefChooser);
 
         pickupChooser = new SendableChooser<Pose2d>();
         SmartDashboard.putData("Pickup Choice " + id, pickupChooser);
     }
 
-    public Command getCommand() {
-        return levelChooser.getSelected().get();
+    public Command getCommand(MultiCommands multiCommands) {
+        return new InstantCommand(()->{
+            int level=levelChooser.getSelected();
+            if(level==0){
+                
+            }else{
+
+            }
+        });
     }
 
     public Pose2d getPose() {

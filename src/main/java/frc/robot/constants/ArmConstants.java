@@ -25,10 +25,10 @@ public class ArmConstants {
     public static final double armTolerance = 0.1;
 
     // Arm goals
-    public static final double goal1 = Units.degreesToRadians(0); // enter low goal
-    public static final double goal2 = Units.degreesToRadians(25); // enter level 2 goal
-    public static final double goal3 = Units.degreesToRadians(50); // enter level 3 goal
-    public static final double goal4 = Units.degreesToRadians(75); // enter high goal
+    public static final double[] goals = {Units.degreesToRadians(0),Units.degreesToRadians(25),Units.degreesToRadians(50),Units.degreesToRadians(75)};
+    public static final double sourceGoal = Units.degreesToRadians(75);
+    public static final double groundIntakeGoal = Units.degreesToRadians(-20);
+    public static final double algaeGoal = Units.degreesToRadians(30);
     public static final double defaultGoal = Units.degreesToRadians(90);
     
     // Simulation constants

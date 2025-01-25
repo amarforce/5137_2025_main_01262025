@@ -26,12 +26,10 @@ public class ElevatorConstants {
     public static final double elevatorTol = 0.1;
 
     // Elevator goals
-    public static final double goal1 = 0.06;
-    public static final double goal2 = 0.26;
-    public static final double goal3 = 0.56;
-    public static final double goal4 = 1.26;
+    public static final double[] goals = {0.06,0.26,0.56,1.26};
     public static final double sourceGoal = 0.76;
     public static final double groundIntakeGoal = 0.26;
+    public static final double algaeGoal = 0.35;
     public static final double defaultGoal = 0;
 
     // Simulation constants

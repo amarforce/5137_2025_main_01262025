@@ -22,20 +22,8 @@ public class ElevatorCommands {
         return new InstantCommand(()->elevator.setGoal(elevator.getGoal()+change.getAsDouble()),elevator);
     }
 
-    public Command moveToL1(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal1),elevator);
-    }
-    
-    public Command moveToL2(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal2),elevator);
-    }
-
-    public Command moveToL3(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal3),elevator);
-    }
-
-    public Command moveToL4(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goal4),elevator);
+    public Command moveToGoal(int goal){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goals[goal-1]),elevator);
     }
 
     public Command moveToSource(){
@@ -48,6 +36,10 @@ public class ElevatorCommands {
 
     public Command moveToDefault(){
         return new InstantCommand(()->elevator.setGoal(ElevatorConstants.defaultGoal),elevator);
+    }
+
+    public Command moveToAlgae(){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.algaeGoal),elevator);
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction dir){

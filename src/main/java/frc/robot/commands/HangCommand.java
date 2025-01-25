@@ -6,22 +6,22 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.Hang;
 
 public class HangCommand extends SequentialCommandGroup {
-    public HangCommand(Hang hang_Subsystem){
+    public HangCommand(Hang hangSubsystem){
         addCommands(
 
-            Commands.runOnce(()-> hang_Subsystem.clampDeactivate()),
+            Commands.runOnce(()-> hangSubsystem.clampDeactivate()),
 
             new WaitCommand(1.0),
             
-            Commands.runOnce(()-> hang_Subsystem.climbExtend()),
+            Commands.runOnce(()-> hangSubsystem.climbExtend()),
 
             new WaitCommand(1.0),
 
-            Commands.runOnce(()-> hang_Subsystem.clampActivate()),
+            Commands.runOnce(()-> hangSubsystem.clampActivate()),
 
             new WaitCommand(1.0),
 
-            Commands.runOnce(()-> hang_Subsystem.climbRetract())
+            Commands.runOnce(()-> hangSubsystem.climbRetract())
 
         );
     }
