@@ -2,7 +2,11 @@ package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -16,60 +20,48 @@ public class SwerveCommands {
         this.swerve = swerve;
     }
 
-    public InstantCommand drive(DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, BooleanSupplier fieldOriented) {
+    public Command drive(DoubleSupplier dx, DoubleSupplier dy, DoubleSupplier dtheta, BooleanSupplier fieldOriented) {
         return new InstantCommand(
-            () -> swerve.percentOutput(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble(), fieldOriented.getAsBoolean()),
+            () -> swerve.setPercentDrive(dx.getAsDouble(), dy.getAsDouble(), dtheta.getAsDouble(), fieldOriented.getAsBoolean()),
             swerve
         );
     }
 
-    public InstantCommand driveToStation() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.stations)),
-            swerve
-        );
+    public Command driveToPose(Supplier<Pose2d> pose){
+        Command auto=AutoBuilder.pathfindToPose(pose.get(), SwerveConstants.constraints);
+        auto.addRequirements(swerve);
+        return auto;
     }
 
-    public InstantCommand driveToReefLeft() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.leftReef)),
-            swerve
-        );
+    public Command driveToStation() {
+        return driveToPose(()->swerve.getClosest(SwerveConstants.stations));
     }
 
-    public InstantCommand driveToReefCenter() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.centerReef)),
-            swerve
-        );
+    public Command driveToReefLeft() {
+        return driveToPose(()->swerve.getClosest(SwerveConstants.leftReef));
     }
 
-    public InstantCommand driveToReefRight() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.rightReef)),
-            swerve
-        );
+    public Command driveToReefCenter() {
+        return driveToPose(()->swerve.getClosest(SwerveConstants.centerReef));
     }
 
-    public InstantCommand driveToProcessor() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(SwerveConstants.processor),
-            swerve
-        );
+    public Command driveToReefRight() {
+        return driveToPose(()->swerve.getClosest(SwerveConstants.rightReef));
     }
 
-    public InstantCommand driveToCage() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(SwerveConstants.cages[swerve.getCage()]),
-            swerve
-        );
+    public Command driveToProcessor() {
+        return driveToPose(()->SwerveConstants.processor);
     }
 
-    public InstantCommand lock() {
+    public Command driveToCage() {
+        return driveToPose(()->SwerveConstants.cages[swerve.getCage()]);
+    }
+
+    public Command lock() {
         return new InstantCommand(() -> swerve.lock(), swerve);
     }
 
-    public InstantCommand resetGyro() {
+    public Command resetGyro() {
         return new InstantCommand(() -> swerve.resetGyro(), swerve);
     }
 

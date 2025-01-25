@@ -1,13 +1,15 @@
 package frc.robot.subsystems;
 
+import frc.robot.Robot;
 import frc.robot.constants.SwerveConstants;
+import frc.robot.other.RobotUtils;
 import frc.robot.other.SwerveFactory;
 import frc.robot.other.Telemetry;
 
 import static edu.wpi.first.units.Units.*;
 
 import java.io.File;
-import java.util.Optional;
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.photonvision.EstimatedRobotPose;
@@ -22,23 +24,16 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -56,16 +51,18 @@ public class Swerve extends SubsystemBase {
 
     private SwerveRequest.FieldCentric fieldOrientedDrive;
     private SwerveRequest.RobotCentric robotOrientedDrive;
+    private SwerveRequest.ApplyRobotSpeeds setChassisSpeeds;
     private SwerveRequest.SwerveDriveBrake lock;
 
     private SendableChooser<Integer> cageChoice;
 
     public Swerve(File file, Vision vision) {
-        swerve = SwerveFactory.createSwerve(file);
+        SwerveFactory factory = new SwerveFactory(file);
+        swerve=factory.create();
         this.vision = vision;
 
-        maxSpeed = SwerveFactory.getMaxSpeed();
-        maxAngularSpeed = 1.5*Math.PI;
+        maxSpeed = factory.getMaxSpeed();
+        maxAngularSpeed = factory.getMaxAngularSpeed();
                 
         fieldOrientedDrive = new SwerveRequest.FieldCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
@@ -74,6 +71,8 @@ public class Swerve extends SubsystemBase {
         robotOrientedDrive = new SwerveRequest.RobotCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+        setChassisSpeeds = new SwerveRequest.ApplyRobotSpeeds();
         
         lock = new SwerveRequest.SwerveDriveBrake();
 
@@ -90,14 +89,14 @@ public class Swerve extends SubsystemBase {
                 this::getCurrentSpeeds,
                 (speeds, feedforwards) -> drive(speeds),
                 new PPHolonomicDriveController(
-                        new PIDConstants(SwerveConstants.translation_kP, SwerveConstants.translation_kI, SwerveConstants.translation_kD),
-                        new PIDConstants(SwerveConstants.rotation_kP, SwerveConstants.rotation_kI, SwerveConstants.rotation_kD)
+                        new PIDConstants(SwerveConstants.translationKP, SwerveConstants.translationKI, SwerveConstants.translationKD),
+                        new PIDConstants(SwerveConstants.rotationKP, SwerveConstants.rotationKI, SwerveConstants.rotationKD)
                 ),
                 config,
-                () -> onRedAlliance(),
+                () -> RobotUtils.onRedAlliance(),
                 this
         );
-
+        
         cageChoice = new SendableChooser<Integer>();
         cageChoice.addOption("Left", 0);
         cageChoice.addOption("Center", 1);
@@ -105,7 +104,7 @@ public class Swerve extends SubsystemBase {
         cageChoice.setDefaultOption("Center", 1);
         SmartDashboard.putData("Cage Choice", cageChoice);
         
-        if (RobotBase.isSimulation()) {
+        if (Robot.isSimulation()) {
             startSimThread();
         }
 
@@ -130,71 +129,31 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds speeds) {
-        setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds));
+        setControl(setChassisSpeeds.withSpeeds(speeds));
     }
 
     public ChassisSpeeds getCurrentSpeeds() {
         return swerve.getState().Speeds;
     }
 
-    public void percentOutput(double percentX, double percentY, double percentTheta, boolean fieldRelative) {
+    public void setPercentDrive(double dx, double dy, double dtheta, boolean fieldRelative) {
         if (fieldRelative) {
             setControl(fieldOrientedDrive
-                .withVelocityX(percentX*maxSpeed)
-                .withVelocityY(percentY*maxSpeed)
-                .withRotationalRate(percentTheta*maxAngularSpeed)
+                .withVelocityX(dx*maxSpeed)
+                .withVelocityY(dy*maxSpeed)
+                .withRotationalRate(dtheta*maxAngularSpeed)
             );
         } else {
             setControl(robotOrientedDrive
-                .withVelocityX(percentX*maxSpeed)
-                .withVelocityY(percentY*maxSpeed)
-                .withRotationalRate(percentTheta*maxAngularSpeed)
+                .withVelocityX(dx*maxSpeed)
+                .withVelocityY(dy*maxSpeed)
+                .withRotationalRate(dtheta*maxAngularSpeed)
             );
         }
     }
 
-    public void driveToPose(Pose2d pose) {
-        if (onRedAlliance()) {
-            pose = invertPose(pose);
-        }
-        Command path = AutoBuilder.pathfindToPose(pose, new PathConstraints(
-            MetersPerSecond.of(5.0),
-            MetersPerSecondPerSecond.of(5.0),
-            RadiansPerSecond.of(1.5*Math.PI),
-            RadiansPerSecondPerSecond.of(Math.PI)),
-            MetersPerSecond.of(0.0));
-        path.addRequirements(this);
-        path.schedule();
-    }
-
-    public Pose2d getClosest(Pose2d[] poses) {
-        Pose2d pose = this.getPose();
-        if (this.onRedAlliance()) {
-            pose = this.invertPose(pose);
-        }
-        int closest = 0;
-        double closest_distance = 100.0;
-        for (int i = 0; i < poses.length; i++) {
-            Transform2d transform = pose.minus(poses[i]);
-            double distance = Math.hypot(transform.getX(), transform.getY());
-            if (distance < closest_distance) {
-                closest_distance = distance;
-                closest = i;
-            }
-        }
-        return poses[closest];
-    }
-
-    public Pose2d invertPose(Pose2d pose) {
-        return new Pose2d(SwerveConstants.fieldLength - pose.getX(), SwerveConstants.fieldWidth - pose.getY(), pose.getRotation().rotateBy(Rotation2d.k180deg));
-    }
-
-    public boolean onRedAlliance() {
-        var alliance = DriverStation.getAlliance();
-            if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-            }
-        return false;
+    public Pose2d getClosest(Pose2d[] poses){
+        return RobotUtils.getClosestPoseToPose(this.getPose(), poses);
     }
 
     public int getCage() {
@@ -202,13 +161,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void resetGyro() {
-        DriverStation.getAlliance().ifPresent(allianceColor -> {
-            swerve.setOperatorPerspectiveForward(
-                allianceColor == Alliance.Red
-                    ? Rotation2d.k180deg
-                    : Rotation2d.kZero
-            );
-        });
+        swerve.setOperatorPerspectiveForward(RobotUtils.getPerspectiveForward());
         swerve.seedFieldCentric();
     }
 
@@ -216,23 +169,16 @@ public class Swerve extends SubsystemBase {
         this.setControl(lock);
     }
 
+    // Reef Visualization using Object Detection
+
     @Override
     public void periodic() {
-        Optional<EstimatedRobotPose> frontPose = vision.getFrontPoseEstimate();
-        Optional<EstimatedRobotPose> leftPose = vision.getFrontPoseEstimate();
-
-        if (frontPose.isPresent()) {
-            swerve.addVisionMeasurement(
-            frontPose.get().estimatedPose.toPose2d(),
-            frontPose.get().timestampSeconds);
-        }
-        
-        if (leftPose.isPresent()) {
-            swerve.addVisionMeasurement(
-            leftPose.get().estimatedPose.toPose2d(),
-            leftPose.get().timestampSeconds);
+        List<EstimatedRobotPose> newPoses=vision.getNewPoses();
+        for(EstimatedRobotPose newPose:newPoses){
+            swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds);
         }
 
+        vision.processNewObjects(this.getPose());
         field.setRobotPose(this.getPose());
         vision.updateSim(this.getPose());
     }

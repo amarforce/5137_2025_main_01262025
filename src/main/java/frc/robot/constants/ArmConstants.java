@@ -1,24 +1,44 @@
 package frc.robot.constants;
 
-public class ArmConstants {
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 
-    public static final double armSpeed = 3.0;
-    public static final int motorId  = 20;
-    public static double kP = 0; // enter
-    public static double kI = 0; // enter
-    public static double kD = 0; // enter
-    public static double ks = 0;
-    public static double kg = 0;
-    public static double kv = 0;
-    public static final double min = 0; // pi /180
-    public static final double max = 100;
-    public static final double tolerance = .1;
-    public static final double goal1 = 0; //enter low goal
-    public static final double goal2 = 0; //enter level 2 goal
-    public static final double goal3 = 0; //enter level 3 goal
-    public static final double goal4 = 0; // enter high goal
+public class ArmConstants {
+    // Motor ID
+    public static final int motorId = 20;
+
+    // Encoder transform
     public static final double armOffset = 0.0;
-    public static final double gearRatio = 1.0;
-    public static final double jkg = 500.0;
+    public static final double gearRatio = 100.0;
+    
+    // PID constants
+    public static final double kP = 30;
+    public static final double kI = 0;
+    public static final double kD = 1;
+
+    // Feedforward constants
+    public static final double kS = 0.0;
+    public static final double kG = 0.0;
+    public static final double kV = 0.0;
+
+    // Arm tolerance
+    public static final double armTolerance = 0.1;
+
+    // Arm goals
+    public static final double[] goals = {Units.degreesToRadians(0),Units.degreesToRadians(25),Units.degreesToRadians(50),Units.degreesToRadians(75)};
+    public static final double sourceGoal = Units.degreesToRadians(-10);
+    public static final double groundIntakeGoal = Units.degreesToRadians(-20);
+    public static final double algaeGoal = Units.degreesToRadians(30);
+    public static final double defaultGoal = Units.degreesToRadians(90);
+    
+    // Simulation constants
+    public static final double minAngle = Units.degreesToRadians(-43);
+    public static final double maxAngle = Units.degreesToRadians(180);
+    public static final double momentOfInertia = 1.2;
     public static final double armLength = 0.594;
+    public static final DCMotor motorSim = DCMotor.getKrakenX60(1);
+
+    // Mechanism constants
+    public static final int mechWidth = 20;
+    public static final int mechHeight = 50;
 }

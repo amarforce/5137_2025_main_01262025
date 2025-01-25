@@ -14,37 +14,32 @@ public class ElevatorCommands {
         this.elevator = elevator;
     }
 
-    public Command setSpeed(DoubleSupplier speed){
-        return new InstantCommand(()->elevator.setSpeed(speed.getAsDouble()),elevator);
-    }
-
     public Command setGoal(DoubleSupplier goal){
         return new InstantCommand(()->elevator.setGoal(goal.getAsDouble()),elevator);
     }
 
-    public Command moveToL1(){
-        System.out.println("x");
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L1goal),elevator);
-    }
-    
-    public Command moveToL2(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L2goal),elevator);
+    public Command changeGoal(DoubleSupplier change){
+        return new InstantCommand(()->elevator.setGoal(elevator.getGoal()+change.getAsDouble()),elevator);
     }
 
-    public Command moveToL3(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L3goal),elevator);
+    public Command moveToGoal(int goal){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.goals[goal-1]),elevator);
     }
 
-    public Command moveToL4(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.L4goal),elevator);
-    }
-
-    public Command moveToIntake(){
-        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.intakeGoal),elevator);
+    public Command moveToSource(){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.sourceGoal),elevator);
     }
 
     public Command moveToGroundIntake(){
         return new InstantCommand(()->elevator.setGoal(ElevatorConstants.groundIntakeGoal),elevator);
+    }
+
+    public Command moveToDefault(){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.defaultGoal),elevator);
+    }
+
+    public Command moveToAlgae(){
+        return new InstantCommand(()->elevator.setGoal(ElevatorConstants.algaeGoal),elevator);
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction dir){
