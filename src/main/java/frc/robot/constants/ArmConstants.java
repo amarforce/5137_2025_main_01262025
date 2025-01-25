@@ -26,7 +26,7 @@ public class ArmConstants {
 
     // Arm goals
     public static final double[] goals = {Units.degreesToRadians(0),Units.degreesToRadians(25),Units.degreesToRadians(50),Units.degreesToRadians(75)};
-    public static final double sourceGoal = Units.degreesToRadians(75);
+    public static final double sourceGoal = Units.degreesToRadians(-10);
     public static final double groundIntakeGoal = Units.degreesToRadians(-20);
     public static final double algaeGoal = Units.degreesToRadians(30);
     public static final double defaultGoal = Units.degreesToRadians(90);

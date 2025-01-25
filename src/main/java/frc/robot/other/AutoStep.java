@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.MultiCommands;
 import frc.robot.constants.GeneralConstants;
 import frc.robot.constants.SwerveConstants;
@@ -85,10 +86,11 @@ public class AutoStep {
     }
 
     public Command getCommand() {
+        System.out.println(pickupChooser.getSelected());
         return new SequentialCommandGroup(
             multiCommands.getCoral(RobotUtils.invertPoseToAlliance(pickupChooser.getSelected())),
             new ParallelCommandGroup(multiCommands.moveToGoal(levelChooser.getSelected()),
-            multiCommands.getSwerveCommands().driveToPose(reefChooser.getSelected())));
+            multiCommands.getSwerveCommands().driveToPose(()->RobotUtils.invertPoseToAlliance(reefChooser.getSelected()))));
     }
 
     public Pose2d getPose() {

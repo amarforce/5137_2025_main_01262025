@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.SwerveConstants;
+import frc.robot.other.RobotUtils;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Hang;
@@ -70,12 +71,12 @@ public class MultiCommands {
         } else {
             if (pose.getY() > 1.75 && pose.getY() < 6.3) {
                 return new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(pose, SwerveConstants.constraints),
+                    swerveCommands.driveToPose(()->pose),
                     moveToGroundIntake()
                 );
             } else {
                 return new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(pose, SwerveConstants.constraints),
+                    swerveCommands.driveToPose(()->pose),
                     moveToSource()
                 );
             }

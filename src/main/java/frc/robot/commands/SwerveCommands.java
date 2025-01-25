@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -12,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.SwerveConstants;
+import frc.robot.other.RobotUtils;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveCommands {
@@ -28,53 +30,34 @@ public class SwerveCommands {
         );
     }
 
-    public Command driveToPose(Pose2d pose){
-        return new InstantCommand(
-            ()->swerve.driveToPose(pose),
-            swerve
-        );
+    public Command driveToPose(Supplier<Pose2d> pose){
+        Command auto=AutoBuilder.pathfindToPose(pose.get(), SwerveConstants.constraints);
+        auto.addRequirements(swerve);
+        return auto;
     }
-    
+
     public Command driveToStation() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.stations)),
-            swerve
-        );
+        return driveToPose(()->swerve.getClosest(SwerveConstants.stations));
     }
 
     public Command driveToReefLeft() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.leftReef)),
-            swerve
-        );
+        return driveToPose(()->swerve.getClosest(SwerveConstants.leftReef));
     }
 
     public Command driveToReefCenter() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.centerReef)),
-            swerve
-        );
+        return driveToPose(()->swerve.getClosest(SwerveConstants.centerReef));
     }
 
     public Command driveToReefRight() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.rightReef)),
-            swerve
-        );
+        return driveToPose(()->swerve.getClosest(SwerveConstants.rightReef));
     }
 
     public Command driveToProcessor() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(SwerveConstants.processor),
-            swerve
-        );
+        return driveToPose(()->SwerveConstants.processor);
     }
 
     public Command driveToCage() {
-        return new InstantCommand(
-            () -> swerve.driveToPose(SwerveConstants.cages[swerve.getCage()]),
-            swerve
-        );
+        return driveToPose(()->SwerveConstants.cages[swerve.getCage()]);
     }
 
     public Command lock() {

@@ -166,13 +166,6 @@ public class Swerve extends SubsystemBase {
         return RobotUtils.getClosestPoseToPose(this.getPose(), poses);
     }
 
-    public void driveToPose(Pose2d pose) {
-        pose = RobotUtils.invertPoseToAlliance(pose);
-        Command path = AutoBuilder.pathfindToPose(pose, SwerveConstants.constraints);
-        path.addRequirements(this);
-        path.schedule();
-    }
-
     public int getCage() {
         return cageChoice.getSelected();
     }
