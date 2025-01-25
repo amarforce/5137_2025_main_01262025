@@ -1,13 +1,33 @@
 package frc.robot.constants;
 
-public class WristConstants {
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 
-    //public static final double maxSupplyCurrent = 40;
-    public static final double defaultMotorSpeed = .3;
-    public static final double gearRatio= 1.0;
-    public static final double jkg = 1.0;
-    public static final double wristLength = 1.0;
-    public static final double min = 1.0;
-    public static final double max = 2.0;
+public class WristConstants {
+    // Motor ID
+    public static final int motorId = 24;
+
+    // Encoder transform
     public static final double wristOffset = 0.0;
+    public static final double gearRatio = 100.0;
+    
+
+    // PID constants
+    public static final double kP = 30;
+    public static final double kI = 0;
+    public static final double kD = 1;
+
+    // Tolerance
+    public static final double wristTolerance = 0.1;
+
+    // Positions
+    public static final double pos1 = Units.degreesToRadians(0);
+    public static final double pos2 = Units.degreesToRadians(90);
+
+    // Simulation constants
+    public static final double momentOfInertia = 0.0155;
+    public static final double wristLength = 0.1524;
+    public static final double minAngle = Units.degreesToRadians(0);
+    public static final double maxAngle = Units.degreesToRadians(90);
+    public static final DCMotor motorSim = DCMotor.getKrakenX60(1);
 }

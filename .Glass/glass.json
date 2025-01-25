@@ -68,15 +68,12 @@
       "/SmartDashboard/Reef Choice 7": "String Chooser",
       "/SmartDashboard/Reef Choice 8": "String Chooser",
       "/SmartDashboard/Reef Choice 9": "String Chooser",
+      "/SmartDashboard/Scoring System": "Mechanism2d",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
-      "/SmartDashboard/Wrist": "Mechanism2d"
+      "/SmartDashboard/Wrist": "Mechanism2d",
+      "/SmartDashboard/Wrist Controller": "PIDController"
     },
     "windows": {
-      "/SmartDashboard/Arm": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",
@@ -85,6 +82,11 @@
         "right": 3466,
         "top": 291,
         "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Scoring System": {
         "window": {
           "visible": true
         }

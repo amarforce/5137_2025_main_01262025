@@ -38,7 +38,6 @@ public class ElevatorConstants {
     public static final double drumRadius = metersPerRotation*gearRatio/(2*Math.PI); // in meters
     public static final double minHeight = 0; // in meters
     public static final double maxHeight = 1.27; // in meters
-    public static final double simPeriod = 0.02;
     public static final DCMotor motorSim = DCMotor.getFalcon500(2);
 
     // Mech constants

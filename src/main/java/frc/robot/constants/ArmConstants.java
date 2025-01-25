@@ -37,7 +37,6 @@ public class ArmConstants {
     public static final double momentOfInertia = 1.2;
     public static final double armLength = 0.594;
     public static final DCMotor motorSim = DCMotor.getKrakenX60(1);
-    public static final double simPeriod = 0.02;
 
     // Mechanism constants
     public static final int mechWidth = 20;

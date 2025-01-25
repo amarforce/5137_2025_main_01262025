@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.GeneralConstants;
 
 public class Elevator extends SubsystemBase {
 
@@ -142,7 +143,7 @@ public class Elevator extends SubsystemBase {
         // Calculate the input voltage to the elevator simulation
         double elevatorInput = (leftMotorSim.getMotorVoltage() - rightMotorSim.getMotorVoltage()) / 2;
         elevatorSim.setInputVoltage(elevatorInput);
-        elevatorSim.update(ElevatorConstants.simPeriod);
+        elevatorSim.update(GeneralConstants.simPeriod);
 
         // Update the motor positions and velocities based on the simulation
         double pos = elevatorSim.getPositionMeters();

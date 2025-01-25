@@ -65,7 +65,7 @@ public class RobotContainer {
 		wrist = new Wrist();
 		intake = new Intake();
     	hang = new Hang();
-		armMechanism = new ArmMechanism(arm, elevator);
+		armMechanism = new ArmMechanism(arm, elevator, wrist);
 
 		swerveCommands = new SwerveCommands(swerve);
 		elevatorCommands = new ElevatorCommands(elevator);
@@ -136,8 +136,8 @@ public class RobotContainer {
 			.onTrue(multiCommands.moveToGoal(1));
 
 		operator.R1()
-			.onTrue(wristCommands.wristForward())
-			.onFalse(wristCommands.wristReverse());
+			.onTrue(wristCommands.toPos1())
+			.onFalse(wristCommands.toPos2());
 
 		operator.L2()
 			.onTrue(intakeCommands.intakeReverse())
