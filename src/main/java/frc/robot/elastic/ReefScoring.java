@@ -6,13 +6,14 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 
 public class ReefScoring implements Sendable{
-    public ReefScoring(){
-        
+    private Reef reef;
+    public ReefScoring(Reef reef){
+        this.reef=reef;
     }
     public int getCount(int level){
         int count=0;
         for(int j=0; j<12; j++){
-            if(Reef.isCoralPlaced(level,j)){
+            if(reef.isCoralPlaced(level,j)){
                 count++;
             }
         }

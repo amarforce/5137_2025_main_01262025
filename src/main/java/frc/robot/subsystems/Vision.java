@@ -1,143 +1,113 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
+import frc.robot.constants.GeneralConstants;
 import frc.robot.constants.VisionConstants;
+import frc.robot.elastic.Reef;
+import frc.robot.other.DetectedObject;
 
 public class Vision extends SubsystemBase {
     private AprilTagFieldLayout fieldLayout;
 
-    private PhotonCamera frontCamera;
-    private PhotonPoseEstimator frontPoseEstimator;
-
-    private PhotonCamera leftCamera;
-    private PhotonPoseEstimator leftPoseEstimator;
-
-    private PhotonCamera frontObjectCamera;
+    private AprilTagCamera[] aprilTagCameras;
+    private ObjectCamera[] objectCameras;
 
     private VisionSystemSim visionSim;
 
-    private SimCameraProperties frontCameraProp;
-    private PhotonCameraSim frontCameraSim;
+    private Reef reef;
 
-    private SimCameraProperties leftCameraProp;
-    private PhotonCameraSim leftCameraSim;
-
-    public Vision() {
+    public Vision(Reef reef) {
         fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
-        frontCamera = new PhotonCamera("frontCamera");
-        frontPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.robotToFrontCamera);
-        frontPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.robotToFrontCamera);
+        AprilTagCamera frontCamera = new AprilTagCamera("frontCamera", VisionConstants.robotToFrontCamera, fieldLayout);
+        AprilTagCamera leftCamera = new AprilTagCamera("leftCamera", VisionConstants.robotToLeftCamera, fieldLayout);
+        aprilTagCameras = new AprilTagCamera[]{frontCamera, leftCamera};
 
-        leftCamera = new PhotonCamera("leftCamera");
-        leftPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.robotToLeftCamera);
-        leftPoseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.robotToLeftCamera);
-
-        frontObjectCamera = new PhotonCamera("frontObjectCamera");
+        ObjectCamera frontObjectCamera = new ObjectCamera("frontObjectCamera",VisionConstants.robotToFrontObjectCamera);
+        objectCameras = new ObjectCamera[]{frontObjectCamera};
 
         visionSim = new VisionSystemSim("main");
         visionSim.addAprilTags(fieldLayout);
 
-        frontCameraProp = new SimCameraProperties();
-        frontCameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
-        frontCameraProp.setFPS(50);
-        frontCameraProp.setAvgLatencyMs(35);
-        frontCameraProp.setLatencyStdDevMs(5);
-        frontCameraSim = new PhotonCameraSim(frontCamera, frontCameraProp);
-        visionSim.addCamera(frontCameraSim, VisionConstants.robotToFrontCamera);
-
-        leftCameraProp = new SimCameraProperties();
-        leftCameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
-        leftCameraProp.setFPS(50);
-        leftCameraProp.setAvgLatencyMs(35);
-        leftCameraProp.setLatencyStdDevMs(5);
-        leftCameraSim = new PhotonCameraSim(leftCamera, leftCameraProp);
-        visionSim.addCamera(leftCameraSim, VisionConstants.robotToLeftCamera);
-
-        if (Robot.isSimulation()) {
-            frontCameraSim.enableDrawWireframe(true);
-            leftCameraSim.enableDrawWireframe(true);
+        for(AprilTagCamera cam:aprilTagCameras){
+            cam.startSim(visionSim);
         }
+
+        this.reef = reef;
     }
 
-    //TODO: Switch to new method when docs update
-
-    public Optional<EstimatedRobotPose> getFrontPoseEstimate() {
-        return frontPoseEstimator.update(frontCamera.getLatestResult());
-    }
-
-    public Optional<EstimatedRobotPose> getLeftPoseEstimate() {
-        return leftPoseEstimator.update(leftCamera.getLatestResult());
-    }
-
-    public List<PhotonTrackedTarget> getObjects() {
-        List<PhotonPipelineResult> result = frontObjectCamera.getAllUnreadResults();
-        if (!result.isEmpty() && result.get(0).hasTargets()) {
-            return result.get(0).getTargets();
+    public List<EstimatedRobotPose> getNewPoses(){
+        var res=new ArrayList<EstimatedRobotPose>();
+        for(AprilTagCamera cam:aprilTagCameras){
+            res.addAll(cam.getNewPoses());
         }
-        return null;
+        return res;
     }
 
-    public Translation3d getTarget3d(PhotonTrackedTarget target, Transform3d robotToCamera, Pose2d robotPose) {
-        Translation3d robotToTarget = target.getBestCameraToTarget().getTranslation().plus(robotToCamera.getTranslation());
-        Translation2d robotToTarget2d = robotToTarget.toTranslation2d();
-        return new Translation3d(robotToTarget2d.getX() + robotPose.getX(), robotToTarget2d.getY() + robotPose.getY(), robotToCamera.getZ());
+    private List<DetectedObject> getNewObjects(Pose2d robotPose) {
+        var res=new ArrayList<DetectedObject>();
+        for(ObjectCamera cam:objectCameras){
+            res.addAll(cam.getNewObjects(robotPose));
+        }
+        return res;
     }
 
-    public int checkObjectOnReef(Translation3d target3d) {
-        int closest = 0;
-        double closest_distance = 100.0;
-        Translation2d[] reefPositions = VisionConstants.reefPositions;
-        for (int i = 0; i < reefPositions.length; i++) {
-            Translation2d diff = target3d.toTranslation2d().minus(reefPositions[i]);
-            double distance = Math.hypot(diff.getX(), diff.getY());
-            if (distance < closest_distance) {
-                closest_distance = distance;
-                closest = i;
+    public void processNewObjects(Pose2d robotPose){
+        List<DetectedObject> objects=getNewObjects(robotPose);
+        for(DetectedObject object:objects){
+            if(object.getClassName()!="Coral"){
+                continue;
+            }
+            Translation3d coralPos=object.getPos();
+            Pair<Integer,Integer> coralLoc=checkObjectOnReef(coralPos);
+            if(coralLoc!=null){
+                reef.setCoralPlaced(coralLoc.getFirst(),coralLoc.getSecond(),true);
+            }
+        };
+    }
+
+    public Pair<Integer,Integer> checkObjectOnReef(Translation3d target3d) {
+        double closestDist=VisionConstants.objectMarginOfError;
+        int closestBranch=-1;
+        int closestLevel=-1;
+        for(int branch=0;branch<VisionConstants.coralPositions.length;branch++){
+            for(int level=0;level<VisionConstants.coralPositions[branch].length;level++){
+                Translation3d pos=VisionConstants.coralPositions[branch][level];
+                double dist=target3d.minus(pos).getNorm();
+                if(dist<closestDist){
+                    closestDist=dist;
+                    closestBranch=branch;
+                    closestLevel=level;
+                }
             }
         }
-        Translation2d closestReef = reefPositions[closest];
-        Translation2d diff = target3d.toTranslation2d().minus(closestReef);
-        if (Math.abs(diff.getX()) <= VisionConstants.objectMarginOfError && Math.abs(diff.getY()) <= VisionConstants.objectMarginOfError) {
-            double height = target3d.getZ();
-            if (Math.abs(height - VisionConstants.L4) < VisionConstants.objectMarginOfError) {
-                return 4 + closest*5;
-            } else if (Math.abs(height - VisionConstants.L3) < VisionConstants.objectMarginOfError) {
-                return 3 + closest*5;
-            } else if (Math.abs(height - VisionConstants.L2) < VisionConstants.objectMarginOfError) {
-                return 2 + closest*5;
-            } else if (Math.abs(height - VisionConstants.L1) < VisionConstants.objectMarginOfError) {
-                return 1 + closest*5;
-            } else {
-                return 0 + closest*5;
-            }
-        } else {
-            return 0;
+        if(closestBranch==-1){
+            return null;
+        }else{
+            return Pair.of(closestLevel, closestBranch);
         }
-    };
+    }
 
-    public void updateSim(Pose2d pose) {
-        visionSim.update(pose);
+    public void updateSim(Pose2d currentPose) {
+        visionSim.update(currentPose);
     }
 }

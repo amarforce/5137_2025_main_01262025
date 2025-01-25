@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.ArmConstants;
 import frc.robot.constants.ElevatorConstants;
 
 public class Elevator extends SubsystemBase {
@@ -38,7 +39,7 @@ public class Elevator extends SubsystemBase {
     private ElevatorFeedforward feedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV);
 
     // Simulation objects for the elevator
-    private ElevatorSim elevatorSim = new ElevatorSim(DCMotor.getFalcon500(2), ElevatorConstants.elevatorGearing, ElevatorConstants.carriageMass, ElevatorConstants.drumRadius, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, ElevatorConstants.startingHeight);
+    private ElevatorSim elevatorSim = new ElevatorSim(ElevatorConstants.motorSim, ElevatorConstants.gearRatio, ElevatorConstants.carriageMass, ElevatorConstants.drumRadius, ElevatorConstants.minHeight, ElevatorConstants.maxHeight, true, ElevatorConstants.defaultGoal);
     private TalonFXSimState leftMotorSim = leftMotor.getSimState();
     private TalonFXSimState rightMotorSim = rightMotor.getSimState();
 
@@ -57,17 +58,12 @@ public class Elevator extends SubsystemBase {
                 log -> {
                     // Record a frame for the elevator motor.
                     log.motor("elevator")
-                        .voltage(Volts.of(leftMotor.get() * RobotController.getBatteryVoltage()))
+                        .voltage(Volts.of(getInput() * RobotController.getBatteryVoltage()))
                         .linearPosition(Meters.of(getMeasurement()))
                         .linearVelocity(MetersPerSecond.of(getVelocity()));
                 },
                 // Tell SysId to make generated commands require this subsystem, suffix test state in WPILog with this subsystem's name ("elevator")
                 this));
-
-    // Create a Mechanism2d visualization of the elevator
-    private final Mechanism2d mech2d = new Mechanism2d(ElevatorConstants.mechWidth, ElevatorConstants.mechHeight);
-    private final MechanismRoot2d mech2dRoot = mech2d.getRoot("Elevator Root", ElevatorConstants.mechWidth / 2, 0);
-    private final MechanismLigament2d elevatorMech2d = mech2dRoot.append(new MechanismLigament2d("Elevator", 0, 90));
 
     // Constructor for the Elevator subsystem
     public Elevator() {
@@ -90,8 +86,14 @@ public class Elevator extends SubsystemBase {
     }
 
     // Set the goal position for the elevator
-    public void setGoal(double goal) {
-        this.goal = goal;
+    public void setGoal(double newGoal) {
+        if(newGoal<ElevatorConstants.minHeight){
+            newGoal=ElevatorConstants.minHeight;
+        }
+        if(newGoal>ElevatorConstants.maxHeight){
+            newGoal=ElevatorConstants.maxHeight;
+        }
+        goal = newGoal;
     }
 
     // Set the speed of the elevator motors
@@ -131,8 +133,6 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putNumber("Elevator Height", getMeasurement());
         SmartDashboard.putNumber("Elevator Velocity", getVelocity());
         SmartDashboard.putNumber("Elevator Input", getInput());
-        elevatorMech2d.setLength(getMeasurement() * ElevatorConstants.mechHeight / ElevatorConstants.maxHeight);
-        SmartDashboard.putData("Elevator", mech2d);
     }
 
     // Periodic method called every robot loop
