@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.constants.ArmConstants;
+import frc.robot.constants.GeneralConstants;
 
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -133,7 +134,7 @@ public class Arm extends SubsystemBase{
         // Get the current motor input voltage and update the arm simulation
         double armInput = armMotorSim.getMotorVoltage();
         armSim.setInputVoltage(armInput);
-        armSim.update(ArmConstants.simPeriod);
+        armSim.update(GeneralConstants.simPeriod);
         
         // Update the motor simulation state with the new arm position and velocity
         double angle = armSim.getAngleRads();

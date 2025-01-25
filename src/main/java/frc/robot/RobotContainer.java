@@ -48,7 +48,6 @@ public class RobotContainer {
 
 	private AutoFactory autoFactory;
 
-	@SuppressWarnings("unchecked")
 	public RobotContainer() {
 		driver = new CommandPS5Controller(0);
 		operator = new CommandPS5Controller(1);
@@ -65,7 +64,7 @@ public class RobotContainer {
 		wrist = new Wrist();
 		intake = new Intake();
     	hang = new Hang();
-		armMechanism = new ArmMechanism(arm, elevator);
+		armMechanism = new ArmMechanism(arm, elevator, wrist);
 
 		swerveCommands = new SwerveCommands(swerve);
 		elevatorCommands = new ElevatorCommands(elevator);
@@ -136,15 +135,15 @@ public class RobotContainer {
 			.onTrue(multiCommands.moveToGoal(1));
 
 		operator.R1()
-			.onTrue(wristCommands.wristForward())
-			.onFalse(wristCommands.wristReverse());
+			.onTrue(wristCommands.toPos1())
+			.onFalse(wristCommands.toPos2());
 
 		operator.L2()
-			.onTrue(intakeCommands.intakeReverse())
+			.onTrue(intakeCommands.outtake())
 			.onFalse(intakeCommands.stop());
 
 		operator.R2()
-			.onTrue(intakeCommands.intakeForward())
+			.onTrue(intakeCommands.intakeUntilSwitched())
 			.onFalse(intakeCommands.stop());
     
 		operator.touchpad()

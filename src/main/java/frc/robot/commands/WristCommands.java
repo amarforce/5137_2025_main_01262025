@@ -1,5 +1,8 @@
 package frc.robot.commands;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.constants.WristConstants;
 import frc.robot.subsystems.Wrist;
 
 
@@ -10,15 +13,19 @@ public class WristCommands {
         this.wrist = wrist;
     }
 
-    public InstantCommand stop(){
-        return new InstantCommand(() -> wrist.stop());
+    public Command toPos1(){
+        return new InstantCommand(()-> wrist.setGoal(WristConstants.pos1));
     }
 
-    public InstantCommand wristForward(){
-        return new InstantCommand(()-> wrist.wristPos1());
+    public Command toPos2(){
+        return new InstantCommand(()-> wrist.setGoal(WristConstants.pos2));
     }
 
-    public InstantCommand wristReverse(){
-        return new InstantCommand(()-> wrist.wristPos2());
+    public Command sysIdQuasistatic(SysIdRoutine.Direction dir){
+        return wrist.sysIdRoutine.quasistatic(dir);
+    }
+
+    public Command sysIdDynamic(SysIdRoutine.Direction dir){
+        return wrist.sysIdRoutine.dynamic(dir);
     }
 }
