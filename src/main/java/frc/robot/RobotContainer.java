@@ -140,11 +140,11 @@ public class RobotContainer {
 			.onFalse(wristCommands.toPos2());
 
 		operator.L2()
-			.onTrue(intakeCommands.intakeReverse())
+			.onTrue(intakeCommands.outtake())
 			.onFalse(intakeCommands.stop());
 
 		operator.R2()
-			.onTrue(intakeCommands.intakeForward())
+			.onTrue(intakeCommands.intakeUntilSwitched())
 			.onFalse(intakeCommands.stop());
     
 		operator.touchpad()
