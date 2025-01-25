@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+
 
 public class ElevatorConstants {
     // Motor IDs
