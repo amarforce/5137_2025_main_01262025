@@ -28,6 +28,13 @@ public class SwerveCommands {
         );
     }
 
+    public Command driveToPose(Pose2d pose){
+        return new InstantCommand(
+            ()->swerve.driveToPose(pose),
+            swerve
+        );
+    }
+    
     public Command driveToStation() {
         return new InstantCommand(
             () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.stations)),

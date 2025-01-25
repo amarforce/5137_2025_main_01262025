@@ -81,4 +81,8 @@ public class MultiCommands {
             }
         }
     }
+
+    public SwerveCommands getSwerveCommands(){
+        return swerveCommands;
+    }
 }

@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import frc.robot.commands.ArmElevatorCommands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.MultiCommands;
 import frc.robot.constants.GeneralConstants;
 import frc.robot.constants.SwerveConstants;
@@ -24,12 +25,14 @@ public class AutoStep {
 
     private int id;
 
+    private MultiCommands multiCommands;
     private SendableChooser<Integer> levelChooser;
     private SendableChooser<Pose2d> reefChooser;
     private SendableChooser<Pose2d> pickupChooser;
 
-    public AutoStep(int id, Supplier<Command>[] commands) {
+    public AutoStep(int id, MultiCommands multiCommands) {
         this.id = id;
+        this.multiCommands = multiCommands;
 
         levelChooser = new SendableChooser<Integer>();
         levelChooser.setDefaultOption("L4", 4);
@@ -81,15 +84,10 @@ public class AutoStep {
         SmartDashboard.putData("Pickup Choice " + id, pickupChooser);
     }
 
-    public Command getCommand(MultiCommands multiCommands) {
-        return new InstantCommand(()->{
-            int level=levelChooser.getSelected();
-            if(level==0){
-                
-            }else{
-
-            }
-        });
+    public Command getCommand() {
+        return new SequentialCommandGroup(
+            multiCommands.getCoral(pickupChooser.getSelected()),
+            new ParallelCommandGroup(multiCommands.moveToGoal(levelChooser.getSelected()),multiCommands.getSwerveCommands().driveToPose(reefChooser.getSelected())));
     }
 
     public Pose2d getPose() {

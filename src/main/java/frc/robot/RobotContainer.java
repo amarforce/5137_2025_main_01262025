@@ -77,7 +77,7 @@ public class RobotContainer {
 
 		configureBindings();
 
-		autoFactory = new AutoFactory();
+		autoFactory = new AutoFactory(multiCommands);
 	}
 
 	private void configureBindings() {
