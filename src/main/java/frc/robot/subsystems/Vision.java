@@ -12,6 +12,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,6 +20,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.GeneralConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.elastic.Reef;
 import frc.robot.other.DetectedObject;
@@ -76,41 +78,34 @@ public class Vision extends SubsystemBase {
                 continue;
             }
             Translation3d coralPos=object.getPos();
-
-        }
+            Pair<Integer,Integer> coralLoc=checkObjectOnReef(coralPos);
+            if(coralLoc!=null){
+                reef.setCoralPlaced(coralLoc.getFirst(),coralLoc.getSecond(),true);
+            }
+        };
     }
 
-    public int checkObjectOnReef(Translation3d target3d) {
-        int closest = 0;
-        double closest_distance = 100.0;
-        Translation2d[] reefPositions = VisionConstants.reefPositions;
-        for (int i = 0; i < reefPositions.length; i++) {
-            Translation2d diff = target3d.toTranslation2d().minus(reefPositions[i]);
-            double distance = Math.hypot(diff.getX(), diff.getY());
-            if (distance < closest_distance) {
-                closest_distance = distance;
-                closest = i;
+    public Pair<Integer,Integer> checkObjectOnReef(Translation3d target3d) {
+        double closestDist=VisionConstants.objectMarginOfError;
+        int closestBranch=-1;
+        int closestLevel=-1;
+        for(int branch=0;branch<VisionConstants.coralPositions.length;branch++){
+            for(int level=0;level<VisionConstants.coralPositions[branch].length;level++){
+                Translation3d pos=VisionConstants.coralPositions[branch][level];
+                double dist=target3d.minus(pos).getNorm();
+                if(dist<closestDist){
+                    closestDist=dist;
+                    closestBranch=branch;
+                    closestLevel=level;
+                }
             }
         }
-        Translation2d closestReef = reefPositions[closest];
-        Translation2d diff = target3d.toTranslation2d().minus(closestReef);
-        if (Math.abs(diff.getX()) <= VisionConstants.objectMarginOfError && Math.abs(diff.getY()) <= VisionConstants.objectMarginOfError) {
-            double height = target3d.getZ();
-            if (Math.abs(height - VisionConstants.L4) < VisionConstants.objectMarginOfError) {
-                return 4 + closest*5;
-            } else if (Math.abs(height - VisionConstants.L3) < VisionConstants.objectMarginOfError) {
-                return 3 + closest*5;
-            } else if (Math.abs(height - VisionConstants.L2) < VisionConstants.objectMarginOfError) {
-                return 2 + closest*5;
-            } else if (Math.abs(height - VisionConstants.L1) < VisionConstants.objectMarginOfError) {
-                return 1 + closest*5;
-            } else {
-                return 0 + closest*5;
-            }
-        } else {
-            return 0;
+        if(closestBranch==-1){
+            return null;
+        }else{
+            return Pair.of(closestLevel, closestBranch);
         }
-    };
+    }
 
     public void updateSim(Pose2d currentPose) {
         visionSim.update(currentPose);
