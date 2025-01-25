@@ -10,20 +10,21 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 public class SwerveConstants {
     public static final double translationalDeadband = 0.1;
     public static final double rotationalDeadband = 0.1;
-    public static final double odometryFrequency = 20;
+    public static final double odometryFrequency = 20; // ms
 
-    public static final double translation_kP = 5.0;
-    public static final double translation_kI = 0.0;
-    public static final double translation_kD = 0.0;
-    public static final double rotation_kP = 5.0;
-    public static final double rotation_kI = 0.0;
-    public static final double rotation_kD = 0.0;
+    public static final double translationKP = 5.0;
+    public static final double translationKI = 0.0;
+    public static final double translationKD = 0.0;
+    public static final double rotationKP = 5.0;
+    public static final double rotationKI = 0.0;
+    public static final double rotationKD = 0.0;
 
-    public static final PathConstraints constaints = new PathConstraints(
+    public static final PathConstraints constraints = new PathConstraints(
         MetersPerSecond.of(5.0),
         MetersPerSecondPerSecond.of(5.0),
         RadiansPerSecond.of(1.5*Math.PI),
@@ -36,15 +37,16 @@ public class SwerveConstants {
     public static final Pose2d rightCage = new Pose2d(new Translation2d(8.5, 5.05), new Rotation2d(3*Math.PI/2));
     public static final Pose2d[] cages = {leftCage, centerCage, rightCage};
 
-    public static final Pose2d stationA = new Pose2d(new Translation2d(1.55, 0.75), new Rotation2d(Math.toRadians(54)));
-    public static final Pose2d stationB = new Pose2d(new Translation2d(0.725, 1.375), new Rotation2d(Math.toRadians(54)));
-    public static final Pose2d stationC = new Pose2d(new Translation2d(0.725, 6.675), new Rotation2d(Math.toRadians(306)));
-    public static final Pose2d stationD = new Pose2d(new Translation2d(1.55, 7.3), new Rotation2d(Math.toRadians(306)));
+    public static final Pose2d stationA = new Pose2d(new Translation2d(1.55, 0.75), new Rotation2d(Units.degreesToRadians(54)));
+    public static final Pose2d stationB = new Pose2d(new Translation2d(0.725, 1.375), new Rotation2d(Units.degreesToRadians(54)));
+    public static final Pose2d stationC = new Pose2d(new Translation2d(0.725, 6.675), new Rotation2d(Units.degreesToRadians(306)));
+    public static final Pose2d stationD = new Pose2d(new Translation2d(1.55, 7.3), new Rotation2d(Units.degreesToRadians(306)));
     public static final Pose2d[] stations = {stationA, stationB, stationC, stationD};
 
     public static final Pose2d leftPickup = new Pose2d(new Translation2d(1.8, 5.825), new Rotation2d(0.0));
     public static final Pose2d centerPickup = new Pose2d(new Translation2d(1.8, 4.025), new Rotation2d(0.0));
     public static final Pose2d rightPickup = new Pose2d(new Translation2d(1.8, 2.225), new Rotation2d(0.0));
+    public static final Pose2d[] pickups = {leftPickup, centerPickup, rightPickup};
 
     public static final Pose2d reefA = new Pose2d(new Translation2d(3.15, 4.19), new Rotation2d(0.0));
     public static final Pose2d reefB = new Pose2d(new Translation2d(3.15, 3.86), new Rotation2d(0.0));
@@ -68,7 +70,4 @@ public class SwerveConstants {
     public static final Pose2d[] leftReef = {reefA, reefC, reefE, reefG, reefI, reefK};
     public static final Pose2d[] centerReef = {reefAB, reefCD, reefEF, reefGH, reefIJ, reefKL};
     public static final Pose2d[] rightReef = {reefB, reefD, reefF, reefH, reefJ, reefL};
-
-    public static final double fieldLength = 17.55;
-    public static final double fieldWidth = 8.05;
 }

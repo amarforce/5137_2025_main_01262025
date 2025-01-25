@@ -24,6 +24,7 @@
     "wheel_radius": 2.0,
     "slip_current": 120.0,
     "max_speed": 5.21,
+    "max_angular_speed": 4.71,
     "current_limit": 60.0,
     "gyro_id": 0,
     "modules": {

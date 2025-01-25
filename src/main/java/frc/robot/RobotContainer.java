@@ -61,7 +61,12 @@ public class RobotContainer {
 		driver = new CommandPS5Controller(0);
 		operator = new CommandPS5Controller(1);
 
-		vision = new Vision();
+		reef = new Reef();
+		reefScoring = new ReefScoring(reef);
+		SmartDashboard.putData("Reef", reef);
+		SmartDashboard.putData("ReefScoring", reefScoring);
+
+		vision = new Vision(reef);
 		swerve = new Swerve(new File(Filesystem.getDeployDirectory(),"swerve.json"), vision);
 		elevator = new Elevator();
 		arm = new Arm();
@@ -76,11 +81,6 @@ public class RobotContainer {
 		wristCommands = new WristCommands(wrist);
 		intakeCommands = new IntakeCommands(intake);
     	hangCommand = new HangCommand(hang);
-
-		reef = new Reef();
-		reefScoring = new ReefScoring();
-		SmartDashboard.putData("Reef", reef);
-		SmartDashboard.putData("ReefScoring", reefScoring);
 
 		configureCommands();
 		configureBindings();

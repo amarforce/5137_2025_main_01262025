@@ -10,6 +10,8 @@ public class VisionConstants {
     public static final Transform3d robotToLeftCamera = new Transform3d(new Translation3d(0, 0.35, 0.2), new Rotation3d(0, -Math.PI/6, Math.PI/2));
     public static final Transform3d robotToFrontObjectCamera = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
 
+    public static final String[] classNames = {"Algae","Coral"};
+
     public static final double objectMarginOfError = 0.1;
 
     public static final Translation2d reefA = new Translation2d(3.75, 4.19);

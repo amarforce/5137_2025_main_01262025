@@ -16,60 +16,60 @@ public class SwerveCommands {
         this.swerve = swerve;
     }
 
-    public InstantCommand drive(DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, BooleanSupplier fieldOriented) {
+    public Command drive(DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, BooleanSupplier fieldOriented) {
         return new InstantCommand(
-            () -> swerve.percentOutput(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble(), fieldOriented.getAsBoolean()),
+            () -> swerve.setPercentDrive(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble(), fieldOriented.getAsBoolean()),
             swerve
         );
     }
 
-    public InstantCommand driveToStation() {
+    public Command driveToStation() {
         return new InstantCommand(
             () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.stations)),
             swerve
         );
     }
 
-    public InstantCommand driveToReefLeft() {
+    public Command driveToReefLeft() {
         return new InstantCommand(
             () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.leftReef)),
             swerve
         );
     }
 
-    public InstantCommand driveToReefCenter() {
+    public Command driveToReefCenter() {
         return new InstantCommand(
             () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.centerReef)),
             swerve
         );
     }
 
-    public InstantCommand driveToReefRight() {
+    public Command driveToReefRight() {
         return new InstantCommand(
             () -> swerve.driveToPose(swerve.getClosest(SwerveConstants.rightReef)),
             swerve
         );
     }
 
-    public InstantCommand driveToProcessor() {
+    public Command driveToProcessor() {
         return new InstantCommand(
             () -> swerve.driveToPose(SwerveConstants.processor),
             swerve
         );
     }
 
-    public InstantCommand driveToCage() {
+    public Command driveToCage() {
         return new InstantCommand(
             () -> swerve.driveToPose(SwerveConstants.cages[swerve.getCage()]),
             swerve
         );
     }
 
-    public InstantCommand lock() {
+    public Command lock() {
         return new InstantCommand(() -> swerve.lock(), swerve);
     }
 
-    public InstantCommand resetGyro() {
+    public Command resetGyro() {
         return new InstantCommand(() -> swerve.resetGyro(), swerve);
     }
 

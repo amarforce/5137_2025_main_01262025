@@ -55,12 +55,12 @@ public class AutoFactory {
         } else {
             if (path.getY() > 1.75 && path.getY() < 6.3) {
                 return new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(path, SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(path, SwerveConstants.constraints),
                     groundIntake.get()
                 );
             } else {
                 return new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(path, SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(path, SwerveConstants.constraints),
                     sourceIntake.get()
                 );
             }
@@ -71,27 +71,27 @@ public class AutoFactory {
         auto = new PathPlannerAuto(
             new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(choiceOne.getPose(), SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(choiceOne.getPose(), SwerveConstants.constraints),
                     choiceOne.getCommand()
                 ),
                 getCoral(choiceTwo.getPickup()),
                 new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(choiceTwo.getPose(), SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(choiceTwo.getPose(), SwerveConstants.constraints),
                     choiceTwo.getCommand()
                 ),
                 getCoral(choiceThree.getPickup()),
                 new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(choiceThree.getPose(), SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(choiceThree.getPose(), SwerveConstants.constraints),
                     choiceThree.getCommand()
                 ),
                 getCoral(choiceFour.getPickup()),
                 new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(choiceFour.getPose(), SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(choiceFour.getPose(), SwerveConstants.constraints),
                     choiceFour.getCommand()
                 ),
                 getCoral(choiceFive.getPickup()),
                 new ParallelCommandGroup(
-                    AutoBuilder.pathfindToPose(choiceFive.getPose(), SwerveConstants.constaints),
+                    AutoBuilder.pathfindToPose(choiceFive.getPose(), SwerveConstants.constraints),
                     choiceFive.getCommand()
                 )
             )

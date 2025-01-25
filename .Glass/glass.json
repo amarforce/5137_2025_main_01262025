@@ -15,6 +15,12 @@
           "open": true
         },
         "open": true
+      },
+      "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
+        "open": true
       }
     },
     "types": {

@@ -4,6 +4,7 @@ import frc.robot.Robot;
 import frc.robot.constants.SwerveConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.elastic.Reef;
+import frc.robot.other.RobotUtils;
 import frc.robot.other.SwerveFactory;
 import frc.robot.other.Telemetry;
 
@@ -60,16 +61,18 @@ public class Swerve extends SubsystemBase {
 
     private SwerveRequest.FieldCentric fieldOrientedDrive;
     private SwerveRequest.RobotCentric robotOrientedDrive;
+    private SwerveRequest.ApplyRobotSpeeds setChassisSpeeds;
     private SwerveRequest.SwerveDriveBrake lock;
 
     private SendableChooser<Integer> cageChoice;
 
     public Swerve(File file, Vision vision) {
-        swerve = SwerveFactory.createSwerve(file);
+        SwerveFactory factory = new SwerveFactory(file);
+        swerve=factory.create();
         this.vision = vision;
 
-        maxSpeed = SwerveFactory.getMaxSpeed();
-        maxAngularSpeed = 1.5*Math.PI;
+        maxSpeed = factory.getMaxSpeed();
+        maxAngularSpeed = factory.getMaxAngularSpeed();
                 
         fieldOrientedDrive = new SwerveRequest.FieldCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
@@ -78,6 +81,8 @@ public class Swerve extends SubsystemBase {
         robotOrientedDrive = new SwerveRequest.RobotCentric()
             .withDeadband(maxSpeed * SwerveConstants.translationalDeadband).withRotationalDeadband(maxAngularSpeed * SwerveConstants.rotationalDeadband)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+        setChassisSpeeds = new SwerveRequest.ApplyRobotSpeeds();
         
         lock = new SwerveRequest.SwerveDriveBrake();
 
@@ -94,14 +99,14 @@ public class Swerve extends SubsystemBase {
                 this::getCurrentSpeeds,
                 (speeds, feedforwards) -> drive(speeds),
                 new PPHolonomicDriveController(
-                        new PIDConstants(SwerveConstants.translation_kP, SwerveConstants.translation_kI, SwerveConstants.translation_kD),
-                        new PIDConstants(SwerveConstants.rotation_kP, SwerveConstants.rotation_kI, SwerveConstants.rotation_kD)
+                        new PIDConstants(SwerveConstants.translationKP, SwerveConstants.translationKI, SwerveConstants.translationKD),
+                        new PIDConstants(SwerveConstants.rotationKP, SwerveConstants.rotationKI, SwerveConstants.rotationKD)
                 ),
                 config,
-                () -> onRedAlliance(),
+                () -> RobotUtils.onRedAlliance(),
                 this
         );
-
+        
         cageChoice = new SendableChooser<Integer>();
         cageChoice.addOption("Left", 0);
         cageChoice.addOption("Center", 1);
@@ -134,66 +139,38 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(ChassisSpeeds speeds) {
-        setControl(new SwerveRequest.ApplyRobotSpeeds().withSpeeds(speeds));
+        setControl(setChassisSpeeds.withSpeeds(speeds));
     }
 
     public ChassisSpeeds getCurrentSpeeds() {
         return swerve.getState().Speeds;
     }
 
-    public void percentOutput(double percentX, double percentY, double percentTheta, boolean fieldRelative) {
+    public void setPercentDrive(double dx, double dy, double dtheta, boolean fieldRelative) {
         if (fieldRelative) {
             setControl(fieldOrientedDrive
-                .withVelocityX(percentX*maxSpeed)
-                .withVelocityY(percentY*maxSpeed)
-                .withRotationalRate(percentTheta*maxAngularSpeed)
+                .withVelocityX(dx*maxSpeed)
+                .withVelocityY(dy*maxSpeed)
+                .withRotationalRate(dtheta*maxAngularSpeed)
             );
         } else {
             setControl(robotOrientedDrive
-                .withVelocityX(percentX*maxSpeed)
-                .withVelocityY(percentY*maxSpeed)
-                .withRotationalRate(percentTheta*maxAngularSpeed)
+                .withVelocityX(dx*maxSpeed)
+                .withVelocityY(dy*maxSpeed)
+                .withRotationalRate(dtheta*maxAngularSpeed)
             );
         }
     }
 
+    public Pose2d getClosest(Pose2d[] poses){
+        return RobotUtils.getClosestPoseToPose(this.getPose(), poses);
+    }
+
     public void driveToPose(Pose2d pose) {
-        if (onRedAlliance()) {
-            pose = invertPose(pose);
-        }
-        Command path = AutoBuilder.pathfindToPose(pose, SwerveConstants.constaints);
+        pose = RobotUtils.invertPoseToAlliance(pose);
+        Command path = AutoBuilder.pathfindToPose(pose, SwerveConstants.constraints);
         path.addRequirements(this);
         path.schedule();
-    }
-
-    public Pose2d getClosest(Pose2d[] poses) {
-        Pose2d pose = this.getPose();
-        if (this.onRedAlliance()) {
-            pose = this.invertPose(pose);
-        }
-        int closest = 0;
-        double closest_distance = 100.0;
-        for (int i = 0; i < poses.length; i++) {
-            Transform2d transform = pose.minus(poses[i]);
-            double distance = Math.hypot(transform.getX(), transform.getY());
-            if (distance < closest_distance) {
-                closest_distance = distance;
-                closest = i;
-            }
-        }
-        return poses[closest];
-    }
-
-    public Pose2d invertPose(Pose2d pose) {
-        return new Pose2d(SwerveConstants.fieldLength - pose.getX(), SwerveConstants.fieldWidth - pose.getY(), pose.getRotation().rotateBy(Rotation2d.k180deg));
-    }
-
-    public boolean onRedAlliance() {
-        var alliance = DriverStation.getAlliance();
-            if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-            }
-        return false;
     }
 
     public int getCage() {
@@ -201,16 +178,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void resetGyro() {
-        DriverStation.getAlliance().ifPresent(allianceColor -> {
-            swerve.setOperatorPerspectiveForward(
-                allianceColor == Alliance.Red
-                    ? Rotation2d.k180deg
-                    : Rotation2d.kZero
-            );
-        });
-        if (Robot.isSimulation()) {
-            swerve.setOperatorPerspectiveForward(Rotation2d.kCCW_90deg);
-        }
+        swerve.setOperatorPerspectiveForward(RobotUtils.getPerspectiveForward());
         swerve.seedFieldCentric();
     }
 
@@ -222,35 +190,12 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        Optional<EstimatedRobotPose> frontPose = vision.getFrontPoseEstimate();
-        Optional<EstimatedRobotPose> leftPose = vision.getFrontPoseEstimate();
-        List<PhotonTrackedTarget> objects = vision.getObjects();
-
-        if (frontPose.isPresent()) {
-            swerve.addVisionMeasurement(
-            frontPose.get().estimatedPose.toPose2d(),
-            frontPose.get().timestampSeconds);
-        }
-        
-        if (leftPose.isPresent()) {
-            swerve.addVisionMeasurement(
-            leftPose.get().estimatedPose.toPose2d(),
-            leftPose.get().timestampSeconds);
+        List<EstimatedRobotPose> newPoses=vision.getNewPoses();
+        for(EstimatedRobotPose newPose:newPoses){
+            swerve.addVisionMeasurement(newPose.estimatedPose.toPose2d(), newPose.timestampSeconds);
         }
 
-        if (objects != null) {
-            objects.forEach((PhotonTrackedTarget target) -> {
-                Translation3d target3d = vision.getTarget3d(target, VisionConstants.robotToFrontObjectCamera, getPose());
-                if (onRedAlliance()) {
-                    target3d = new Translation3d(SwerveConstants.fieldLength - target3d.getX(), SwerveConstants.fieldWidth - target3d.getY(), target3d.getZ());
-                }
-                int x = vision.checkObjectOnReef(target3d);
-                if (x%5 > 0) {
-                    Reef.setCoralPlaced(x/5, x%5, true);
-                }
-            });
-        }
-
+        vision.processNewObjects(this.getPose());
         field.setRobotPose(this.getPose());
         vision.updateSim(this.getPose());
     }

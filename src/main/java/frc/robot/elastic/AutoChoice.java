@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.SwerveConstants;
+import frc.robot.other.RobotUtils;
 
 /**
  * Creates three {@link SendableChooser}s for level select, reef position, and pickup position.
@@ -88,29 +89,11 @@ public class AutoChoice {
         return levelChooser.getSelected().get();
     }
 
-    public Pose2d invertPose(Pose2d pose) {
-        return new Pose2d(SwerveConstants.fieldLength - pose.getX(), SwerveConstants.fieldWidth - pose.getY(), pose.getRotation().rotateBy(Rotation2d.k180deg));
-    }
-
-    public boolean onRedAlliance() {
-        var alliance = DriverStation.getAlliance();
-            if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-            }
-        return false;
-    }
-
     public Pose2d getPose() {
-        if (onRedAlliance()) {
-            return invertPose(reefChooser.getSelected());
-        }
-        return reefChooser.getSelected();
+        return RobotUtils.invertPoseToAlliance(reefChooser.getSelected());
     }
 
     public Pose2d getPickup() {
-        if (onRedAlliance()) {
-            return invertPose(pickupChooser.getSelected());
-        }
-        return pickupChooser.getSelected();
+        return RobotUtils.invertPoseToAlliance(pickupChooser.getSelected());
     }
 }
