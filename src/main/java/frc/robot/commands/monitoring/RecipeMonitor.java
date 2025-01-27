@@ -118,4 +118,4 @@ public class RecipeMonitor extends Command {
     public RecipeStatus getRecipeStatus(String recipeName) {
         return recipeStatuses.get(recipeName);
     }
-}s
+}
