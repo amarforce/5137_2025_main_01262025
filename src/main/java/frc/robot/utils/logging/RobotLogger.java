@@ -34,12 +34,9 @@ public class RobotLogger {
 
     // Logs data to the DataLog.
     public void logData(String subsystem, String event, String details) {
-        // Get the current timestamp.
-        String timestamp = getTimestamp();
-        // Append the log message to the DataLog, under the subsystem's "events" topic.
-        // The message format is: "timestamp, event, details".
-        // The timestamp is used as the entry's timestamp (0 means use current time).
-        log.append(subsystem + "/events",
-            timestamp + ", " + event + ", " + details);
+        // Append the event and details to the DataLog, under the subsystem's "events" topic.
+        // DataLog automatically timestamps entries.
+        log.log(subsystem + "/events/event", event, getTimestamp());
+        log.log(subsystem + "/events/details", details, getTimestamp());
     }
 }

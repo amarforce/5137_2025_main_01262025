@@ -1,22 +1,20 @@
-// src/main/java/frc/robot/subsystems/SubsystemBase.java
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.logging.RobotLogger;
 
 /**
  * Base class for all subsystems providing common functionality.
  * Extends {@link edu.wpi.first.wpilibj2.command.SubsystemBase} and adds logging and state management.
  */
-public abstract class SubsystemBase extends edu.wpi.first.wpilibj2.command.SubsystemBase {
+public abstract class BaseSubsystem extends edu.wpi.first.wpilibj2.command.SubsystemBase {
     protected final RobotLogger logger;
     protected boolean isEnabled = false;
     protected String lastError = "";
     
     /**
-     * Constructs a SubsystemBase with a default logger instance.
+     * Constructs a BaseSubsystem with a default logger instance.
      */
-    public SubsystemBase() {
+    public BaseSubsystem() {
         logger = RobotLogger.getInstance();
     }
     
@@ -40,4 +38,4 @@ public abstract class SubsystemBase extends edu.wpi.first.wpilibj2.command.Subsy
      * @return The current measurement of the subsystem.
      */
     public abstract double getMeasurement();
-}
+} 
