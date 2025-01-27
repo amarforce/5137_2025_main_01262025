@@ -150,6 +150,25 @@ public class RobotContainer {
 		.onTrue(hangCommand);
 	}
 
+    private void configureCommands() {
+        // Create the L4 placement command
+        Command dropCoralL4 = new DropCoralL4Command(
+            multiCommands,
+            swerveCommands,
+            intakeCommands
+        );
+        
+        // Add to SmartDashboard for testing
+        SmartDashboard.putData("Drop Coral L4", dropCoralL4);
+        
+        // Bind to operator controls (example)
+        operator.triangle().onTrue(dropCoralL4);
+        
+        // Add monitoring
+        L4PlacementMonitor monitor = new L4PlacementMonitor(multiCommands);
+        monitor.schedule();
+    }	
+
 	public Command getAutonomousCommand() {
 		return autoFactory.getAuto();
 	}
