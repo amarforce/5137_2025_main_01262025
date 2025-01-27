@@ -9,17 +9,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+// Add other necessary imports here
 
 import frc.robot.elastic.*;
 import frc.robot.other.ArmMechanism;
 import frc.robot.other.AutoFactory;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
+import frc.robot.commands.recipes.coral.DropCoralL4Command;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -74,6 +75,16 @@ public class RobotContainer {
     	hangCommand = new HangCommand(hang);
 		multiCommands = new MultiCommands(arm,elevator,wrist,swerve,intake,hang,armCommands,elevatorCommands,wristCommands,swerveCommands,intakeCommands,hangCommand);
 
+        // Create the L4 placement command
+        Command dropCoralL4 = new DropCoralL4Command(
+            multiCommands,
+            swerveCommands,
+            intakeCommands
+        );
+
+		// Add to SmartDashboard for testing
+		SmartDashboard.putData("Drop Coral L4", dropCoralL4);
+		
 		configureBindings();
 
 		autoFactory = new AutoFactory(multiCommands);
@@ -101,16 +112,6 @@ public class RobotContainer {
 		driver.povRight().onTrue(swerveCommands.driveToReefRight());
 
 		driver.options().onTrue(swerveCommands.resetGyro());
-
-		/*
-		driver.povUp().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineTranslation)));
-		driver.povLeft().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineSteer)));
-		driver.povRight().onTrue(new InstantCommand(() -> swerve.setRoutine(swerve.m_sysIdRoutineRotation)));
-		driver.options().and(driver.povDown().negate()).whileTrue(swerveCommands.sysIdDynamic(Direction.kForward));
-		driver.options().and(driver.povDown()).whileTrue(swerveCommands.sysIdDynamic(Direction.kForward));
-		driver.create().and(driver.povDown().negate()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
-		driver.create().and(driver.povDown()).whileTrue(swerveCommands.sysIdQuasistatic(Direction.kReverse));
-		*/
 
 		// Cancel all commands
 		driver.touchpad().onTrue(new InstantCommand(() -> CommandScheduler.getInstance().cancelAll()));
@@ -148,7 +149,7 @@ public class RobotContainer {
     
 		operator.touchpad()
 		.onTrue(hangCommand);
-	}
+
 
         // Create the L4 placement command
         Command dropCoralL4 = new DropCoralL4Command(
@@ -156,18 +157,13 @@ public class RobotContainer {
             swerveCommands,
             intakeCommands
         );
-        
-        // Add to SmartDashboard for testing
-        SmartDashboard.putData("Drop Coral L4", dropCoralL4);
-        // Bind to operator controls (example)
-        operator.triangle().onTrue(new InstantCommand(dropCoralL4));
-		
-        // Add monitoring
-        // L4PlacementMonitor monitor = new L4PlacementMonitor(multiCommands); // Error: L4PlacementMonitor cannot be resolved to a type
-        // monitor.schedule(); // Error: Syntax error on token "schedule", Identifier expected after this token
-    }
 
-	public Command getAutonomousCommand() {
+	// Bind to operator controls (example)
+		operator.L1().onTrue(dropCoralL4);
+	}
+    
+
+    public Command getAutonomousCommand() {
 		return autoFactory.getAuto();
 	}
 }
