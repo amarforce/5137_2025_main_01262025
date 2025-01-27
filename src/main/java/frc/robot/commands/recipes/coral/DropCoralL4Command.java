@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.MultiCommands;
+import frc.robot.commands.SwerveCommands;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.WristConstants;
@@ -24,15 +27,24 @@ public class DropCoralL4Command extends SequentialCommandGroup {
             MultiCommands multiCommands,
             SwerveCommands swerveCommands,
             IntakeCommands intakeCommands) {
+
+            logger.logPlacementStart(4);  // Log start of L4 placement
         
         addCommands(
             // Step 1: Initial safety check and preparation
             Commands.runOnce(() -> {
                 // Verify all subsystems are operational
                 if (!multiCommands.areSubsystemsReady()) {
+                    logger.logError("SUBSYSTEM_NOT_READY", "Systems failed readiness check");
                     throw new RuntimeException("Subsystems not ready for L4 placement");
                 }
+                logger.logPositioning(
+                    multiCommands.getElevator().getMeasurement(),
+                    multiCommands.getArm().getMeasurement(),
+                    multiCommands.getWrist().getMeasurement()
+                );
             }),
+
 
             // Step 2: Vision-guided approach to reef
             new ParallelCommandGroup(
@@ -73,6 +85,11 @@ public class DropCoralL4Command extends SequentialCommandGroup {
                 // Maintain position until arm is clear
                 swerveCommands.lock()
             )
+
+            Commands.runOnce(() -> {
+                logger.logPlacementComplete(4, true);
+            })
+
         );
     }
 
