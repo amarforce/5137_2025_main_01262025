@@ -86,6 +86,15 @@ public class DropCoralL4Command extends SequentialCommandGroup {
                 swerveCommands.lock()
             )
 
+            new ParallelCommandGroup(
+                multiCommands.moveToGoal(4).withTimeout(2.0),  // Add timeout
+                swerveCommands.lock()
+            ).handleInterrupt(() -> {
+                // Add recovery behavior
+                multiCommands.moveToDefault();
+                logger.logError("TIMEOUT", "Movement timeout occurred");
+            }),
+
             Commands.runOnce(() -> {
                 logger.logPlacementComplete(4, true);
             })
@@ -103,5 +112,11 @@ public class DropCoralL4Command extends SequentialCommandGroup {
         return Math.abs(currentHeight - targetHeight) < ElevatorConstants.elevatorTol;
     }
 
+
+    private boolean isSystemSafe() {
+        return multiCommands.getElevator().isWithinLimits() &&
+               multiCommands.getArm().isWithinLimits() &&
+               multiCommands.getWrist().isWithinLimits();
+    }
 
 }

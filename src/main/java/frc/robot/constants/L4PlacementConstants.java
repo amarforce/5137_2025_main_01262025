@@ -13,4 +13,9 @@
         // Position tolerances
         public static final double HEIGHT_TOLERANCE = ElevatorConstants.elevatorTol;
         public static final double ANGLE_TOLERANCE = ArmConstants.armTolerance;
+
+        public static final double MOVEMENT_TIMEOUT = 2.0;
+        public static final double STABILITY_WAIT = 0.2;
+        public static final double RELEASE_TIME = 0.5;
+        public static final double SAFETY_MARGIN = 0.05;
     }
