@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.recipes.coral;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -12,9 +12,10 @@ import frc.robot.commands.SwerveCommands;
 import frc.robot.constants.ArmConstants;
 import frc.robot.constants.VisionConstants;
 import frc.robot.constants.WristConstants;
+import frc.robot.utils.logging.CoralLogger;
 
 public class DropCoralL4Command extends SequentialCommandGroup {
-    
+    private final CoralLogger logger = new CoralLogger();
     /**
      * Creates a new command for dropping coral on L4 level.
      * This command coordinates multiple subsystems to accurately place coral.
@@ -27,15 +28,16 @@ public class DropCoralL4Command extends SequentialCommandGroup {
             MultiCommands multiCommands,
             SwerveCommands swerveCommands,
             IntakeCommands intakeCommands) {
-
-            logger.logPlacementStart(4);  // Log start of L4 placement
         
         addCommands(
             // Step 1: Initial safety check and preparation
             Commands.runOnce(() -> {
+                // Log start of L4 placement
+                System.out.println("Starting L4 placement");
                 // Verify all subsystems are operational
                 if (!multiCommands.areSubsystemsReady()) {
-                    logger.logError("SUBSYSTEM_NOT_READY", "Systems failed readiness check");
+                    // Log error if systems failed readiness check
+                    System.err.println("SUBSYSTEM_NOT_READY: Systems failed readiness check");
                     throw new RuntimeException("Subsystems not ready for L4 placement");
                 }
                 logger.logPositioning(
@@ -43,6 +45,8 @@ public class DropCoralL4Command extends SequentialCommandGroup {
                     multiCommands.getArm().getMeasurement(),
                     multiCommands.getWrist().getMeasurement()
                 );
+
+                logger.logPlacementComplete(4, true);
             }),
 
 
@@ -63,8 +67,8 @@ public class DropCoralL4Command extends SequentialCommandGroup {
                 // Ensure wrist is in correct orientation
                 Commands.runOnce(() -> {
                     // Using pos2 (90 degrees) for straight placement
-                    wristCommands.toPos2()
-                })
+                    multiCommands.getWristCommands().toPos2();
+                }, multiCommands.getWristCommands().getWrist())
             ),
 
             // Step 4: Verification pause
@@ -84,20 +88,12 @@ public class DropCoralL4Command extends SequentialCommandGroup {
                 multiCommands.moveToDefault(),
                 // Maintain position until arm is clear
                 swerveCommands.lock()
-            )
-
-            new ParallelCommandGroup(
-                multiCommands.moveToGoal(4).withTimeout(2.0),  // Add timeout
-                swerveCommands.lock()
-            ).handleInterrupt(() -> {
+            }).handleInterrupt(() -> {
                 // Add recovery behavior
                 multiCommands.moveToDefault();
                 logger.logError("TIMEOUT", "Movement timeout occurred");
-            }),
+            });
 
-            Commands.runOnce(() -> {
-                logger.logPlacementComplete(4, true);
-            })
 
         );
     }

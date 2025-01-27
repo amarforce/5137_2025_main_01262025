@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.sim.TalonFXSimState;
+import frc.robot.constants.ArmConstants;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -25,7 +25,15 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 public class Arm extends SubsystemBase{
-    
+
+    private final RelativeEncoder encoder;
+    private final PIDController pidController;
+    private final CANSparkMax motor;
+    private double setpoint;
+    // Constants for position control
+    private static final double POSITION_TOLERANCE = 0.01; // Example value
+    private static final double VELOCITY_TOLERANCE = 0.01; // Example value
+
     // Motor controller for the arm
     private TalonFX armMotor = new TalonFX(ArmConstants.motorId, "rhino");
     
@@ -56,7 +64,7 @@ public class Arm extends SubsystemBase{
                 this));
     
     // Simulation state for the motor
-    private TalonFXSimState armMotorSim = armMotor.getSimState();
+    private TalonFXSimCollection armMotorSimCollection = armMotor.getSimCollection();
         
     // Constructor for the Arm subsystem
     public Arm() {

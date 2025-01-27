@@ -40,7 +40,6 @@ public class RobotLogger {
         // The message format is: "timestamp, event, details".
         // The timestamp is used as the entry's timestamp (0 means use current time).
         log.append(subsystem + "/events",
-            timestamp + ", " + event + ", " + details,
-            0);
+            timestamp + ", " + event + ", " + details);
     }
 }

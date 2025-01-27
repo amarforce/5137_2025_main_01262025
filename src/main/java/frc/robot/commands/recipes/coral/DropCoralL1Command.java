@@ -112,7 +112,7 @@ public class DropCoralL1Command extends SequentialCommandGroup {
                 swerveCommands.lock(),
                 // Command to orient the wrist to the predefined position suitable for L1 coral placement.
                 Commands.runOnce(() -> {
-                    multiCommands.getWrist().toPos1(); // Ensure wrist is correctly positioned for L1 using preset position 1.
+                    multiCommands.getWrist().setPosition(Wrist.Position.POS1); // Ensure wrist is correctly positioned for L1 using preset position 1.
                 })
             ).withTimeout(1.0), // Set a 1-second timeout for final positioning to prevent indefinite waiting.
 
@@ -163,9 +163,9 @@ public class DropCoralL1Command extends SequentialCommandGroup {
      * @return true if all systems are safe for L1 placement, false otherwise.
      */
     private boolean isSystemSafe() {
-        return multiCommands.getElevator().isWithinLimits() &&
-               multiCommands.getArm().isWithinLimits() &&
-               multiCommands.getWrist().isWithinLimits() &&
+        return multiCommands.getElevator().isWithinSafeOperatingRange() &&
+               multiCommands.getArm().isWithinSafeOperatingRange() &&
+               multiCommands.getWrist().isWithinSafeOperatingRange() &&
                !multiCommands.getElevator().isAtLowerLimit(); // Extra safety check to ensure elevator is not at lower limit for L1
     }
 
@@ -177,7 +177,7 @@ public class DropCoralL1Command extends SequentialCommandGroup {
      * @return true if the current height is within the tolerance of the L1 height, false otherwise.
      */
     private boolean isAtL1Height(double currentHeight) {
-        return Math.abs(currentHeight - VisionConstants.l1_height) <
-               ElevatorConstants.elevatorTol; // Compare current height to L1 height with tolerance
+        return Math.abs(currentHeight - VisionConstants.L1_HEIGHT) <
+               ElevatorConstants.ELEVATOR_TOL; // Compare current height to L1 height with tolerance
     }
 }

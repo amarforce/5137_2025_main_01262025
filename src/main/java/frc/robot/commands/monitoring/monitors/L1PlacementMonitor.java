@@ -72,8 +72,8 @@ public class L1PlacementMonitor extends Command {
      */
     private boolean areSystemsReady() {
         return multiCommands.getElevator().atSetpoint() &&
-               multiCommands.getArm().atSetpoint() &&
-               multiCommands.getWrist().atSetpoint() &&
+               multiCommands.getArm().isAtSetpoint() &&
+               multiCommands.getWrist().isAtSetpoint() &&
                !multiCommands.getElevator().isAtLowerLimit();
     }
 }

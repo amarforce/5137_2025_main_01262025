@@ -150,7 +150,6 @@ public class RobotContainer {
 		.onTrue(hangCommand);
 	}
 
-    private void configureCommands() {
         // Create the L4 placement command
         Command dropCoralL4 = new DropCoralL4Command(
             multiCommands,
@@ -160,14 +159,13 @@ public class RobotContainer {
         
         // Add to SmartDashboard for testing
         SmartDashboard.putData("Drop Coral L4", dropCoralL4);
-        
         // Bind to operator controls (example)
-        operator.triangle().onTrue(dropCoralL4);
-        
+        operator.triangle().onTrue(new InstantCommand(dropCoralL4));
+		
         // Add monitoring
-        L4PlacementMonitor monitor = new L4PlacementMonitor(multiCommands);
-        monitor.schedule();
-    }	
+        // L4PlacementMonitor monitor = new L4PlacementMonitor(multiCommands); // Error: L4PlacementMonitor cannot be resolved to a type
+        // monitor.schedule(); // Error: Syntax error on token "schedule", Identifier expected after this token
+    }
 
 	public Command getAutonomousCommand() {
 		return autoFactory.getAuto();

@@ -156,4 +156,14 @@ public class Elevator extends SubsystemBase {
         // Update the RoboRIO simulation with the current battery voltage
         RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
     }
+
+    /**
+     * Checks if the elevator is at its lower limit.
+     * @return true if the elevator is at the lower limit, false otherwise.
+     */
+    public boolean isAtLowerLimit() {
+        // Implement the logic to determine if the elevator is at the lower limit.
+        // This might involve checking a sensor or a specific condition.
+        return false; // Replace with actual condition
+    }
 }
